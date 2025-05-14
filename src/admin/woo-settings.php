@@ -10,7 +10,7 @@ namespace EPOS_CRM\Src\Admin;
 
 use WC_Settings_Page;
 
-// use WC_Admin_Settings;
+use WC_Admin_Settings;
 
 use EPOS_CRM\Utils\Utils_Core;
 
@@ -36,7 +36,15 @@ class Woo_Settings extends WC_Settings_Page
   {
 
     $this->id    = EPOS_CRM_PREFIX;
+    $this->label = __('EPOS CRM',  'epos-crm-settings-tab');
+
     add_filter('woocommerce_settings_tabs_array', array($this, 'add_settings_tab'), 50);
+    add_action('woocommerce_admin_field_epos_crm_des', array($this, 'epos_crm_des_setting'));
+    // add_action('woocommerce_sections_' . $this->id, array($this, 'output_sections'));
+    add_action('woocommerce_settings_' . $this->id, array($this, 'output'));
+    // add_action('woocommerce_settings_save_' . $this->id, array($this, 'save'));
+    add_action('epos_crm_authentication' . $this->id, array($this, 'epos_crm_authentication_callback'));
+    add_action('admin_head', array($this, 'crm_inline_css'));
   }
 
   /**
@@ -46,85 +54,127 @@ class Woo_Settings extends WC_Settings_Page
    */
   public function add_settings_tab($settings_tabs)
   {
-    $settings_tabs[$this->id] = __('EPOS CRM',  'epos-settings-tab');
+    $settings_tabs[$this->id] = __('EPOS CRM',  'epos-crm-settings-tab');
     return $settings_tabs;
   }
-
-  public function admin_assets()
+  /**
+   * Add css inline to tab
+   *
+   * @return array
+   */
+  public function crm_inline_css()
   {
-    $version = time();
-    $current_user_id = get_current_user_id();
-    // Pass the user ID to the script
-    wp_enqueue_script('admin-booking-js', EPOS_CRM_URL . '/assets/dist/js/admin.min.js', [], $version, true);
-    wp_enqueue_style('booking-css', EPOS_CRM_URL . '/assets/dist/css/admin.min.css', [], $version);
-    wp_localize_script('booking-js-current-id', 'admin_id', array(
-      'userID' => $current_user_id,
-    ));
+    if (isset($_GET['tab']) && $_GET['tab'] != EPOS_CRM_PREFIX) return;
+    echo '<style>.form-table .titledesc{width:280px}.submit{display:none;}</style>';
   }
 
-  public function admin_page()
+  public function get_settings($section = null)
   {
-    add_menu_page('Zippy Add-ons', 'Zippy Add-ons', 'manage_options', 'zippy-addons', array($this, 'dashboard_render'), 'dashicons-list-view', 6);
-    // SubPage
-    // add_submenu_page('zippy-bookings', 'Settings', 'Settings', 'manage_options', 'settings', array($this, 'settings_render'));
+    $settings = array(
+      'section_title' => $this->show_warning_message(),
+      'divider' => Utils_Core::divider(),
+      'epos_crm_des'         => array(
+        'id'       => 'epos_crm_des',
+        'title'   => __('Payment methods', 'epos-crm-settings-tab'),
+        'type'      => 'epos_crm_des',
+      ),
+
+      'divider' => Utils_Core::divider(),
+      'section_end' => array(
+        'type' => 'sectionend',
+        'id' => 'epos-crm-settings-tab_end'
+      )
+    );
+    return apply_filters('wc_settings_tab_settings', $settings, $section);
   }
 
-
-  public function render()
+  /**
+   * Get sections
+   *
+   * @return array
+   */
+  public function get_sections()
   {
-    echo Utils_Core::get_template('booking-dashboard.php', [], dirname(__FILE__), '/templates');
-  }
-  public function settings_render()
-  {
-    echo Utils_Core::get_template('settings.php', [], dirname(__FILE__), '/templates');
+    //Init Tab 
+    $sections = array(
+      ''                      => __('General', 'epos-crm-settings-tab'),
+    );
+    return apply_filters('woocommerce_get_sections_' . $this->id, $sections);
   }
 
-  public function dashboard_render()
+  /**
+   * Output the settings
+   */
+  public function output()
+  {
+    global $current_section;
+    $settings = $this->get_settings($current_section);
+    WC_Admin_Settings::output_fields($settings);
+  }
+
+  /**
+   * Save settings
+   */
+  public function save()
+  {
+    global $current_section;
+    $settings = $this->get_settings($current_section);
+
+
+    $has_error = false;
+
+    // Validate 'auth_epos_crm'
+    if (isset($_POST['epos_be_url']) && empty($_POST['epos_be_url'])) {
+      WC_Admin_Settings::add_error(__('EPOS Backend URL is required.', 'woocommerce'));
+      $has_error = true;
+    }
+
+    // Validate 'epos_crm_term'
+    if (isset($_POST['epos_crm_term']) && empty($_POST['epos_crm_term'])) {
+      WC_Admin_Settings::add_error(__('Please agree with the term and conditions.', 'woocommerce'));
+      $has_error = true;
+    }
+
+    if (!$has_error) {
+      WC_Admin_Settings::save_fields($settings);
+      $this->save_settings_for_current_section();
+      $this->do_update_options_action();
+      $this->do_epos_crm_authentication();
+    }
+  }
+  private function do_epos_crm_authentication($section_id = null)
+  {
+    //Get Backend URL
+    $be_url = get_option('epos_be_url');
+
+    if (empty($be_url)) WC_Admin_Settings::add_error(__('Authentication failed !.', 'woocommerce'));
+
+    do_action('epos_crm_authentication');
+  }
+
+  function epos_crm_des_setting($current_section = '')
   {
     echo Utils_Core::get_template('index.php', [], dirname(__FILE__), '/templates');
   }
 
-  public function remove_default_stylesheets($handle)
+  private function show_warning_message()
   {
-    $apply_urls = [
-      'toplevel_page_zippy-addons',
-    ];
+    $settings_title = array(
+      'name'     => __('EPOS CRM', 'epos-crm-settings-tab'),
+      'type'     => 'title',
+      'desc'     => __('This configuration Integrates with <span style="color: #000;">EPOS V5 Backend Customer Data </span><br>
+      <span style="color: #cc0000;display: block;">**Any adjustments must update directly in EPOS V5 Backend </span>', 'epos-crm-settings-tab'),
+      'id'       => 'zippy_settings_tab_title_section'
+    );
+    return $settings_title;
+  }
 
-    if (in_array($handle, $apply_urls)) {
-      // Deregister the 'forms' stylesheet
-      wp_deregister_style('forms');
-
-      add_action('admin_head', function () {
-        $admin_url = get_admin_url();
-        $styles_to_load = [
-          'dashicons',
-          'admin-bar',
-          'common',
-          'admin-menu',
-          'dashboard',
-          'list-tables',
-          'edit',
-          'revisions',
-          'media',
-          'themes',
-          'about',
-          'nav-menus',
-          'wp-pointer',
-          'widgets',
-          'site-icon',
-          'l10n',
-          'buttons',
-          'wp-auth-check'
-        ];
-
-        $wp_version = get_bloginfo('version');
-
-        // Generate the styles URL
-        $styles_url = $admin_url . '/load-styles.php?c=0&dir=ltr&load=' . implode(',', $styles_to_load) . '&ver=' . $wp_version;
-
-        // Enqueue the stylesheet
-        echo '<link rel="stylesheet" href="' . esc_url($styles_url) . '" media="all">';
-      });
-    }
+  function epos_crm_authentication_callback()
+  {
+    var_dump('shin');
+  }
+  function output_sections()
+  {
+    echo Utils_Core::get_template('index.php', [], dirname(__FILE__), '/templates');
   }
 }

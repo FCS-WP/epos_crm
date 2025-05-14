@@ -1,6 +1,6 @@
 <?php
 
-namespace Zippy_Addons\Src\Routers;
+namespace EPOS_CRM\Src\Routers;
 
 /**
  * Bookings General Router
@@ -10,15 +10,15 @@ namespace Zippy_Addons\Src\Routers;
 
 defined('ABSPATH') or die();
 
-use Zippy_Addons\Src\Routers\General\Zippy_General_Router;
+use EPOS_CRM\Src\Routers\General\General_Routers;
 
 
-class Zippy_Booking_Routers
+class Epos_Crm_Routers
 {
   protected static $_instance = null;
 
   /**
-   * @return Zippy_Booking_Routers
+   * @return Epos_Crm_Routers
    */
 
   public static function get_instance()
@@ -31,6 +31,6 @@ class Zippy_Booking_Routers
 
   public function __construct()
   {
-    Zippy_General_Router::get_instance();
+    General_Routers::get_instance();
   }
 }

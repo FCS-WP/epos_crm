@@ -1,5 +1,6 @@
-const path = require("path");
 const webpack = require("webpack");
+const path = require("path");
+const dotenv = require("dotenv");
 // Init Config Webpack
 // Css extraction and minification
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -15,18 +16,24 @@ const destChildTheme = "./";
 const destFileCss = destChildTheme + "/assets/web/sass/app.scss";
 const destAdminFileCss = destChildTheme + "/assets/admin/sass/app.scss";
 const destAdminFileJs = destChildTheme + "/assets/admin/js/index.js";
-const destDocFileJs = destChildTheme + "/docs/index.js";
 const destFileJs = destChildTheme + "/assets/web/js/index.js";
 const destOutput = destChildTheme + "/assets/dist";
 
-module.exports = [
-  {
-    mode: "development",
+module.exports = (env, argv) => {
+  const mode = argv.mode || "development";
+  const envPath = path.resolve(__dirname, `.env.${mode}`);
+  const envVars = dotenv.config({ path: envPath }).parsed || {};
+
+  const envKeys = Object.keys(envVars).reduce((acc, key) => {
+    acc[`process.env.${key}`] = JSON.stringify(envVars[key]);
+    return acc;
+  }, {});
+  return {
+    mode,
     stats: "minimal",
     entry: {
       web: [destFileCss, destFileJs],
       admin: [destAdminFileCss, destAdminFileJs],
-      doc: [destDocFileJs],
     },
     output: {
       filename: destOutput + "/js/[name].min.js",
@@ -39,7 +46,6 @@ module.exports = [
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
           loader: "babel-loader",
-          
         },
         // sass compilation
         {
@@ -107,6 +113,8 @@ module.exports = [
     // },
     plugins: [
       // Get ENV Variables
+      new webpack.DefinePlugin(envKeys),
+
       // clear out build directories on each build
       new CleanWebpackPlugin({
         cleanOnceBeforeBuildPatterns: [
@@ -132,5 +140,5 @@ module.exports = [
         new CssMinimizerPlugin(),
       ],
     },
-  },
-];
+  };
+};

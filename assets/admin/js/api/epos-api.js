@@ -1,12 +1,12 @@
 import axios from "axios";
 
-export const makeRequest = async (
+export const eposRequest = async (
   endpoint,
   params = {},
   method = "GET", // Default method set to GET
-  token = process.env.EPOS_CLIENT_KEY
+  token = "FEhI30q7ySHtMfzvSDo6RkxZUDVaQ1BBU3lBcGhYS3BrQStIUT09"
 ) => {
-  const baseURL = "/wp-json/epos-crm/v1";
+  const baseURL = "https://livedevs.com";
   const api = axios.create({ baseURL });
 
   // Build headers
@@ -23,12 +23,13 @@ export const makeRequest = async (
   const config = {
     url: endpoint,
     method: method.toUpperCase(),
-    headers,
+    // headers,
     ...(method.toUpperCase() === "GET" ? { params } : { data: params }),
   };
 
   try {
     const response = await api.request(config);
+    console.log(response);
     return { data: response.data };
   } catch (error) {
     const errorMessage =

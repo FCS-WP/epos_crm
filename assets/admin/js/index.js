@@ -1,20 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Index from "./Pages/Bookings";
-
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "../theme/theme";
+import Index from "./Page/crm";
 
 function initializeApp() {
-  const zippyBookings = document.getElementById("root_app");
+  const eposCRM = document.getElementById("epos_crm_root");
 
-  if (zippyBookings) {
-    const root = ReactDOM.createRoot(zippyBookings);
+  if (eposCRM) {
+    const root = ReactDOM.createRoot(eposCRM);
     root.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <>Shin</>
+        <Index />
       </ThemeProvider>
     );
   }

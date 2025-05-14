@@ -1,5 +1,2 @@
-<div class="wrap">
-  <div id="zippy-addons-root">
-    <div id="zippy_settings"></div>
-  </div>
-</div>
+
+<div id="epos_crm_root"></div>
