@@ -20,7 +20,7 @@ class Zippy_Response_Handler
     return new WP_REST_Response(array(
       'status' => 'success',
       'message' => $message,
-      'data' => $data,
+      "data" => $data
     ), $status_code);
   }
 

@@ -95,6 +95,41 @@ class Utils_Core
     );
   }
 
+  public static function get_subdomain($url)
+  {
+    $host = parse_url($url, PHP_URL_HOST);
+    $parts = explode('.', $host);
+    if (count($parts) > 2) {
+      return $parts[0];
+    }
+    return null; // No subdomain found
+  }
+
+
+  public static function loadEnv($env_name)
+  {
+    $file = EPOS_CRM_DIR_PATH . '/.env';
+    if (!file_exists($file)) {
+      return false;
+    }
+
+    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $env = [];
+    foreach ($lines as $line) {
+      if (strpos(trim($line), '#') === 0) continue;
+
+      list($name, $value) = explode('=', $line, 2);
+      $name = trim($name);
+      $value = trim($value);
+
+      // Remove surrounding quotes
+      $value = trim($value, "'\"");
+
+      $env[$name] = $value;
+    }
+
+    return isset($env[$env_name]) ?  $env[$env_name] : '';
+  }
   /**
    * Gets the client IP
    *

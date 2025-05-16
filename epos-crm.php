@@ -61,13 +61,17 @@ if (!defined('EPOS_CRM_API_NAMESPACE')) {
 }
 
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 /* ------------------------------------------
 // Includes
  --------------------------- --------------------------------------------- */
+if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
+  require_once EPOS_CRM_DIR_PATH . '/vendor/autoload.php';
+}
+
 require EPOS_CRM_DIR_PATH . '/includes/autoload.php';
 require EPOS_CRM_DIR_PATH . '/includes/constances.php';
 

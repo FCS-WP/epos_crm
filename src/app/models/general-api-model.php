@@ -15,6 +15,7 @@ use WP_REST_Response;
 class General_Api_Model
 {
 
+  
   public static function update_option_args()
   {
     return array(

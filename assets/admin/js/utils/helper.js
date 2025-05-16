@@ -1,10 +1,8 @@
-// utils/getDomainName.ts (or .js if you're not using TypeScript)
-
 export const getDomainName = (url) => {
   try {
     const currentUrl = url || window.location.href;
-    const { hostname } = new URL(currentUrl);
-    return hostname;
+    const { protocol, hostname, port } = new URL(currentUrl);
+    return `${protocol}//${hostname}${port ? `:${port}` : ""}`;
   } catch (error) {
     console.error("Invalid URL:", error);
     return "";

@@ -40,7 +40,7 @@ class General_Routers
 
   public function general_init_api()
   {
-    register_rest_route(EPOS_CRM_API_NAMESPACE, '/zippy-options', array(
+    register_rest_route(EPOS_CRM_API_NAMESPACE, '/update-options', array(
       'methods' => 'POST',
       'callback' => [General_Controller::class, 'update_option_configs'],
       'args' => General_Api_Model::update_option_args(),
@@ -48,21 +48,21 @@ class General_Routers
 
     ));
 
-    register_rest_route(EPOS_CRM_API_NAMESPACE, '/zippy-options', array(
-      'methods' => 'GET',
+    register_rest_route(EPOS_CRM_API_NAMESPACE, '/get-options', array(
+      'methods' => 'POST',
       'callback' => [General_Controller::class, 'get_option_configs'],
       'args' => General_Api_Model::get_option_args(),
       'permission_callback' => array(Epos_Crm_Permission::class, 'zippy_permission_callback'),
 
     ));
 
-    // register_rest_route(EPOS_CRM_API_NAMESPACE, '/zippy-signin', array(
-    //   'methods' => 'POST',
-    //   'callback' => [General_Controller::class, 'signin'],
-    //   'args' => General_Api_Model::signin_args(),
-    //   'permission_callback' => "__return_true",
+    register_rest_route(EPOS_CRM_API_NAMESPACE, '/auth', array(
+      'methods' => 'POST',
+      'callback' => [General_Controller::class, 'check_authentication'],
+      'args' => General_Api_Model::get_option_args(),
+      'permission_callback' => "__return_true",
 
-    // ));
+    ));
 
     // register_rest_route(EPOS_CRM_API_NAMESPACE, '/zippy-register', array(
     //   'methods' => 'POST',

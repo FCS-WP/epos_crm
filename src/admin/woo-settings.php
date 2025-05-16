@@ -1,29 +1,21 @@
 <?php
 
-/**
- * CRM WOO ADMIN TAB
- *
- *
- */
-
 namespace EPOS_CRM\Src\Admin;
 
 use WC_Settings_Page;
-
 use WC_Admin_Settings;
-
 use EPOS_CRM\Utils\Utils_Core;
+use EPOS_CRM\Src\Controllers\Auth\Epos_Auth_controller;
 
-defined('ABSPATH') or die();
+defined('ABSPATH') || exit;
 
 class Woo_Settings extends WC_Settings_Page
 {
   protected static $_instance = null;
 
   /**
-   * @return Woo_Settings
+   * Singleton instance
    */
-
   public static function get_instance()
   {
     if (is_null(self::$_instance)) {
@@ -34,147 +26,158 @@ class Woo_Settings extends WC_Settings_Page
 
   public function __construct()
   {
-
     $this->id    = EPOS_CRM_PREFIX;
-    $this->label = __('EPOS CRM',  'epos-crm-settings-tab');
+    $this->label = __('EPOS CRM', 'epos-crm-settings-tab');
 
-    add_filter('woocommerce_settings_tabs_array', array($this, 'add_settings_tab'), 50);
-    add_action('woocommerce_admin_field_epos_crm_des', array($this, 'epos_crm_des_setting'));
-    // add_action('woocommerce_sections_' . $this->id, array($this, 'output_sections'));
-    add_action('woocommerce_settings_' . $this->id, array($this, 'output'));
-    // add_action('woocommerce_settings_save_' . $this->id, array($this, 'save'));
-    add_action('epos_crm_authentication' . $this->id, array($this, 'epos_crm_authentication_callback'));
-    add_action('admin_head', array($this, 'crm_inline_css'));
+    add_filter('woocommerce_settings_tabs_array', [$this, 'add_settings_tab'], 50);
+    add_action('woocommerce_admin_field_epos_crm_des', [$this, 'renderSettingsSection']);
+    add_action('woocommerce_settings_' . $this->id, [$this, 'output']);
+    add_action('epos_crm_authentication', [$this, 'handleAuthenticationCallback']);
+    add_action('admin_head', [$this, 'addInlineCSS']);
   }
 
   /**
-   * Add plugin options tab
-   *
-   * @return array
+   * Add the tab to WooCommerce settings
    */
   public function add_settings_tab($settings_tabs)
   {
-    $settings_tabs[$this->id] = __('EPOS CRM',  'epos-crm-settings-tab');
+    $settings_tabs[$this->id] = __('EPOS CRM', 'epos-crm-settings-tab');
     return $settings_tabs;
   }
-  /**
-   * Add css inline to tab
-   *
-   * @return array
-   */
-  public function crm_inline_css()
-  {
-    if (isset($_GET['tab']) && $_GET['tab'] != EPOS_CRM_PREFIX) return;
-    echo '<style>.form-table .titledesc{width:280px}.submit{display:none;}</style>';
-  }
-
-  public function get_settings($section = null)
-  {
-    $settings = array(
-      'section_title' => $this->show_warning_message(),
-      'divider' => Utils_Core::divider(),
-      'epos_crm_des'         => array(
-        'id'       => 'epos_crm_des',
-        'title'   => __('Payment methods', 'epos-crm-settings-tab'),
-        'type'      => 'epos_crm_des',
-      ),
-
-      'divider' => Utils_Core::divider(),
-      'section_end' => array(
-        'type' => 'sectionend',
-        'id' => 'epos-crm-settings-tab_end'
-      )
-    );
-    return apply_filters('wc_settings_tab_settings', $settings, $section);
-  }
 
   /**
-   * Get sections
-   *
-   * @return array
-   */
-  public function get_sections()
-  {
-    //Init Tab 
-    $sections = array(
-      ''                      => __('General', 'epos-crm-settings-tab'),
-    );
-    return apply_filters('woocommerce_get_sections_' . $this->id, $sections);
-  }
-
-  /**
-   * Output the settings
+   * Output settings fields
    */
   public function output()
   {
-    global $current_section;
-    $settings = $this->get_settings($current_section);
+    $settings = $this->get_settings();
     WC_Admin_Settings::output_fields($settings);
   }
 
   /**
-   * Save settings
+   * Get settings array
    */
-  public function save()
+  public function get_settings($section = null)
   {
-    global $current_section;
-    $settings = $this->get_settings($current_section);
+    return apply_filters('wc_settings_tab_settings', [
+      'section_title' => $this->getTitleDescription(),
+      'divider' => Utils_Core::divider(),
+      'epos_crm_des' => [
+        'id'    => 'epos_crm_des',
+        'title' => __('Authentication', 'epos-crm-settings-tab'),
+        'type'  => 'epos_crm_des',
+      ],
+      'divider' => Utils_Core::divider(),
+      'section_end' => [
+        'type' => 'sectionend',
+        'id'   => 'epos-crm-settings-tab_end',
+      ],
+    ], $section);
+  }
 
+  /**
+   * Display either auth form or success message
+   */
+  public function renderSettingsSection()
+  {
+    $is_auth = $this->triggerAuthentication();
+    if (isset($_GET['epos_error']) && $_GET['epos_error'] == 1) {
+      $auth_error = get_option('epos_crm_auth_error');
+      if ($auth_error) {
+        echo '<div class="notice notice-error"><p>' . esc_html($auth_error) . '</p></div>';
+      }
+    }
+    if (!$is_auth) {
 
-    $has_error = false;
+      echo Utils_Core::get_template('auth-form.php', [], dirname(__FILE__), '/templates');
+    } else {
+      $epos_url = get_option('epos_be_url', '');
+      echo Utils_Core::get_template('auth-success.php', ['epos_url' => esc_url($epos_url)], dirname(__FILE__), '/templates');
+    }
+  }
 
-    // Validate 'auth_epos_crm'
-    if (isset($_POST['epos_be_url']) && empty($_POST['epos_be_url'])) {
-      WC_Admin_Settings::add_error(__('EPOS Backend URL is required.', 'woocommerce'));
-      $has_error = true;
+  /**
+   * Trigger authentication callback
+   */
+  public function handleAuthenticationCallback($code)
+  {
+
+    $authController = new Epos_Auth_controller($code);
+    $response = $authController->Auth();
+
+    if (!empty($response['data']->access_token)) {
+      $this->storeToken($response['data']->access_token);
+      delete_option('epos_crm_auth_error');
+
+      // Optional: redirect back to clean the URL
+      wp_redirect(admin_url('admin.php?page=wc-settings&tab=' . EPOS_CRM_PREFIX));
+      exit;
+    } else {
+      // Store the error message for later display
+      update_option('epos_crm_auth_error', 'Failed to authenticate with EPOS. Please try again.');
+
+      // Redirect back with error query param
+      $error_url = admin_url('admin.php?page=wc-settings&tab=' . EPOS_CRM_PREFIX . '&epos_error=1');
+      wp_redirect($error_url);
+      exit;
+    }
+  }
+
+  /**
+   * Trigger custom authentication action
+   */
+  private function triggerAuthentication()
+  {
+    $token = get_option('epos_crm_token_key');
+
+    if (!empty($token)) return true;
+
+    if (!is_admin() || empty($_GET['code'])) {
+      return false;
     }
 
-    // Validate 'epos_crm_term'
-    if (isset($_POST['epos_crm_term']) && empty($_POST['epos_crm_term'])) {
-      WC_Admin_Settings::add_error(__('Please agree with the term and conditions.', 'woocommerce'));
-      $has_error = true;
-    }
+    $code = sanitize_text_field($_GET['code']);
 
-    if (!$has_error) {
-      WC_Admin_Settings::save_fields($settings);
-      $this->save_settings_for_current_section();
-      $this->do_update_options_action();
-      $this->do_epos_crm_authentication();
-    }
-  }
-  private function do_epos_crm_authentication($section_id = null)
-  {
-    //Get Backend URL
-    $be_url = get_option('epos_be_url');
+    do_action('epos_crm_authentication', $code);
 
-    if (empty($be_url)) WC_Admin_Settings::add_error(__('Authentication failed !.', 'woocommerce'));
-
-    do_action('epos_crm_authentication');
+    return true;
   }
 
-  function epos_crm_des_setting($current_section = '')
+  /**
+   * Save access token
+   */
+  private function storeToken($token)
   {
-    echo Utils_Core::get_template('index.php', [], dirname(__FILE__), '/templates');
+    update_option('epos_crm_token_key', sanitize_text_field($token), true);
   }
 
-  private function show_warning_message()
+  /**
+   * Output inline CSS to hide the default save button
+   */
+  public function addInlineCSS()
   {
-    $settings_title = array(
-      'name'     => __('EPOS CRM', 'epos-crm-settings-tab'),
-      'type'     => 'title',
-      'desc'     => __('This configuration Integrates with <span style="color: #000;">EPOS V5 Backend Customer Data </span><br>
-      <span style="color: #cc0000;display: block;">**Any adjustments must update directly in EPOS V5 Backend </span>', 'epos-crm-settings-tab'),
-      'id'       => 'zippy_settings_tab_title_section'
-    );
-    return $settings_title;
+    if (!isset($_GET['tab']) || $_GET['tab'] !== EPOS_CRM_PREFIX) return;
+
+    echo '<style>
+            .form-table .titledesc { width: 280px; }
+            .submit { display: none; }
+        </style>';
   }
 
-  function epos_crm_authentication_callback()
+  /**
+   * Section title and description
+   */
+  private function getTitleDescription()
   {
-    var_dump('shin');
-  }
-  function output_sections()
-  {
-    echo Utils_Core::get_template('index.php', [], dirname(__FILE__), '/templates');
+    return [
+      'name' => __('EPOS CRM', 'epos-crm-settings-tab'),
+      'type' => 'title',
+      'desc' => __(
+        'This configuration integrates with <strong>EPOS V5 Backend Customer Data</strong>.<br>
+                <span style="color: #cc0000;">**Any adjustments must be made directly in the EPOS V5 Backend.</span>',
+        'epos-crm-settings-tab'
+      ),
+      'id' => 'epos_crm_settings_title_section'
+    ];
   }
 }

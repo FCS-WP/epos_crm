@@ -18,7 +18,7 @@ defined('ABSPATH') or die();
 
 class General_Controller
 {
-   /**
+  /**
    *
    * UPDATE CONFIG WORDPRESS OPTION
    *
@@ -50,19 +50,16 @@ class General_Controller
       return Zippy_Response_Handler::error($message);
     }
 
-    $status = [];
+    $result = [];
     foreach ($query_param['option_name'] as $key => $name) {
       $value = $query_param['option_data'][$key];
 
       $update_result = update_option($name, $value, false);
-      $status[$name] = $update_result ? 'updated' : 'failed';
+      $result[$name] = $value;
     }
 
     // Prepare response
-    $response = [
-      'status' => $status,
-      'data' => $query_param
-    ];
+    $response = $result;
     $message = 'Update option successfully';
 
     return Zippy_Response_Handler::success($response, $message);
@@ -85,16 +82,41 @@ class General_Controller
 
     $option_names = array_map('sanitize_text_field', $request->get_param('option_name'));
 
-    $configurations = [];
+    $data = [];
+
     foreach ($option_names as $option_name) {
-      $configurations[$option_name] = get_option($option_name, null); // `null` as the default value
+      $data[$option_name] = get_option($option_name, null); // `null` as the default value
     }
 
     // Prepare response
-    $response = [
-      'data' => $configurations,
+    $response =  $data;
+    return Zippy_Response_Handler::success($response);
+  }
+
+  public static function check_authentication(WP_REST_Request $request)
+  {
+    // Define validation rules
+    $required_fields = [
+      "option_name" => ["data_type" => "array", "required" => true],
     ];
 
+    // Validate request fields
+    $validate = Zippy_Request_Validation::validate_request($required_fields, $request);
+
+    if (!empty($validate)) {
+      return Zippy_Response_Handler::error($validate);
+    }
+
+    $option_names = array_map('sanitize_text_field', $request->get_param('option_name'));
+
+    $data = [];
+
+    foreach ($option_names as $option_name) {
+      $data[$option_name] = get_option($option_name, null);
+    }
+
+    // Prepare response
+    $response =  $data;
     return Zippy_Response_Handler::success($response);
   }
 }

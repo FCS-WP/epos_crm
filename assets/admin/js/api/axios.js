@@ -4,7 +4,7 @@ export const makeRequest = async (
   endpoint,
   params = {},
   method = "GET", // Default method set to GET
-  token = process.env.EPOS_CLIENT_KEY
+  token = process.env.EPOS_API_KEY
 ) => {
   const baseURL = "/wp-json/epos-crm/v1";
   const api = axios.create({ baseURL });
@@ -29,7 +29,7 @@ export const makeRequest = async (
 
   try {
     const response = await api.request(config);
-    return { data: response.data };
+    return response.data;
   } catch (error) {
     const errorMessage =
       error?.response?.data?.message ||
