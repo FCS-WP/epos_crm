@@ -68,17 +68,22 @@ if (!defined('EPOS_CRM_API_NAMESPACE')) {
 /* ------------------------------------------
 // Includes
  --------------------------- --------------------------------------------- */
+if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
+  require_once EPOS_CRM_DIR_PATH . '/vendor/autoload.php';
+}
+
 require EPOS_CRM_DIR_PATH . '/includes/autoload.php';
+require EPOS_CRM_DIR_PATH . '/includes/constances.php';
 
 use  EPOS_CRM\Src\Admin\Settings;
 
-// use EPOS_CRM\Src\Routers\Zippy_Booking_Routers;
+use EPOS_CRM\Src\Routers\Epos_Crm_Routers;
 
 /**
  *
  * Init Zippy Booking
  */
 
- Settings::get_instance();
+Settings::get_instance();
 
-//  Zippy_Booking_Routers::get_instance();
+Epos_Crm_Routers::get_instance();

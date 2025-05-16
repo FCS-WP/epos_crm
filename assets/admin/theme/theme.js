@@ -3,13 +3,13 @@ import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#40a944",
+      main: "#2271b1",
       contrastText: "#ffffff",
       pending: "#feb600",
       approve: "#009588",
       complete: "#007c00",
       approved: "#90caf9",
-      cancelled: "#ef9a9a"
+      cancelled: "#ef9a9a",
     },
     secondary: {
       main: "#216ba5",
@@ -25,7 +25,9 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily:
+      '"-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+
     h1: {
       fontSize: "2.5rem",
       fontWeight: 700,
@@ -48,11 +50,43 @@ const theme = createTheme({
         },
       },
     },
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          "&.Mui-error": {
+            color: "#CC0000",
+            fontStyle: "italic",
+          },
+        },
+      },
+    },
     MuiPaper: {
       styleOverrides: {
         root: {
           padding: "16px",
           boxShadow: "1px 2px 12px rgba(184, 193, 211, .4)",
+        },
+      },
+    },
+    MuiInput: {
+      styleOverrides: {
+        underline: {
+          "&:before": {
+            borderBottom: "none",
+          },
+          "&:hover:not(.Mui-disabled, .Mui-error):before": {
+            borderBottom: "none",
+          },
+          "&:after": {
+            borderBottom: "none",
+          },
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: "none",
         },
       },
     },
