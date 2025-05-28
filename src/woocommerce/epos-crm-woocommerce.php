@@ -6,18 +6,20 @@
  *
  */
 
-namespace Zippy_Booking\Src\Woocommerce;
+namespace EPOS_CRM\Src\Woocommerce;
 
 defined('ABSPATH') or die();
 
-use Zippy_Booking\Utils\Zippy_Utils_Core;
+use EPOS_CRM\Utils\Zippy_Utils_Core;
 
-class Zippy_Woo_Booking
+use EPOS_CRM\Utils\Woo_Session_Handler;
+
+class Epos_Crm_Woocommerce
 {
   protected static $_instance = null;
 
   /**
-   * @return Zippy_Woo_Booking
+   * @return Epos_Crm_Woocommerce
    */
 
   public static function get_instance()
@@ -39,15 +41,10 @@ class Zippy_Woo_Booking
     $this->set_hooks();
 
     /* Update Checkout After Applied Coupon */
-    add_action('woocommerce_applied_coupon', array($this, 'after_apply_coupon_action'));
-    add_action('woocommerce_product_options_pricing', array($this, 'add_custom_price_field_to_product'));
-
-    
-  }
-
-  function after_apply_coupon_action($coupon_code)
-  {
-    echo '<script>jQuery( "body" ).trigger( "update_checkout" ); </script>';
+    add_action('trigger_update_checkout', array($this, 'trigger_update_checkout_callback'), 1, 3);
+    // EPOS Prefill Customer Infor
+    add_action('woocommerce_checkout_get_value', array($this, 'prefill_checkout_fields'), 10, 2);
+    add_filter('woocommerce_checkout_fields', array($this, 'custom_override_checkout_fields'));
   }
 
   protected function set_hooks()
@@ -93,18 +90,53 @@ class Zippy_Woo_Booking
 
     return file_exists($path) ? $path : $template;
   }
-  public function add_custom_price_field_to_product()
+
+  public function custom_override_checkout_fields($fields)
   {
-    woocommerce_wp_text_input(array(
-      'id' => '_extra_price',
-      'label' => __('Extra price ($)', 'woocommerce'),
-      'description' => __('Enter an price by hour for this product.', 'woocommerce'),
-      'desc_tip' => 'true',
-      'type' => 'number',
-      'custom_attributes' => array(
-        'step' => '0.1',
-        'min' => '0'
-      )
-    ));
+    unset($fields['billing']['billing_company']);
+    return $fields;
+  }
+
+  public function trigger_update_checkout_callback()
+  {
+    echo '<script>jQuery( "body" ).trigger( "update_checkout" ); </script>';
+  }
+
+  public function prefill_checkout_fields($value, $input)
+  {
+    if (!is_checkout()) {
+      return $value;
+    }
+
+    $session = new Woo_Session_Handler;
+
+    $session_data = $session->get('epos_customer_data')->attributes;
+
+    if (!$session_data || !is_object($session_data)) {
+      return $value;
+    }
+
+    switch ($input) {
+      case 'billing_first_name':
+        return $session_data->full_name ?? $value;
+      case 'billing_last_name':
+        return $session_data->full_name ?? $value;
+      case 'billing_email':
+        return $session_data->email ?? $value;
+      case 'billing_phone':
+        return $session_data->phone_number ?? $value;
+      case 'billing_address_1':
+        return $session_data->address_street_1 ?? $value;
+      case 'billing_address_2':
+        return $session_data->address_street_2 ?? $value;
+      case 'billing_postcode':
+        return $session_data->address_postal_code ?? $value;
+      case 'billing_city':
+        return $session_data->address_city ?? $value;
+      case 'billing_country':
+        return $session_data->address_country ?? $value;
+      default:
+        return $value;
+    }
   }
 }

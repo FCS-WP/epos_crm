@@ -9,7 +9,9 @@ import SignUp from "./SignUp";
 
 const AuthDialog = ({ open, onClose }) => {
   const [tab, setTab] = useState(0);
-
+  const handleOnClose = () => {
+    onClose();
+  };
   return (
     <Dialog
       open={open}
@@ -51,7 +53,7 @@ const AuthDialog = ({ open, onClose }) => {
             <SignUp />
           </>
         ) : (
-          <SignIn />
+          <SignIn handleClosePopup={handleOnClose}  />
         )}
       </DialogContent>
     </Dialog>

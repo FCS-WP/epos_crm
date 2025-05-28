@@ -74,10 +74,13 @@ require_once EPOS_CRM_DIR_PATH . 'includes/constances.php';
 use EPOS_CRM\Src\Admin\Settings;
 use EPOS_CRM\Src\Routers\Epos_Crm_Routers;
 use EPOS_CRM\Src\Web\Epos_Crm_Web;
+use EPOS_CRM\Src\Woocommerce\Epos_Crm_Woocommerce;
 
 add_action('plugins_loaded', function () {
   // Initialize Settings and Routers
   Settings::get_instance();
   Epos_Crm_Routers::get_instance();
   Epos_Crm_Web::get_instance();
+  Epos_Crm_Woocommerce::get_instance();
+
 });

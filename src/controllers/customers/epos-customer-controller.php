@@ -13,7 +13,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use EPOS_CRM\Src\App\Models\Zippy_Request_Validation;
-use WC_Checkout;
+use EPOS_CRM\Utils\Woo_Session_Handler;
 
 defined('ABSPATH') or die();
 
@@ -24,6 +24,7 @@ class Epos_Customer_controller
 
 
   private static $client;
+  private static $customer_key = 'epos_customer_data';
 
   private static function init_client()
   {
@@ -37,13 +38,13 @@ class Epos_Customer_controller
 
   public static function login($request)
   {
-
-
     $response = self::loginAPI($request);
 
     if ($response['status'] == 'success') {
-    
+      $session = new Woo_Session_Handler;
+      $session->set(self::$customer_key, $response['data']);
     }
+
     return $response;
   }
 
@@ -77,7 +78,6 @@ class Epos_Customer_controller
         'Content-Type' => 'application/vnd.api+json',
         'Accept' => 'application/vnd.api+json',
       ];
-
 
       $login = self::$client->post("api/modules/woocommerce/customers/login", ['headers' => $headers, 'json' => $params]);
 

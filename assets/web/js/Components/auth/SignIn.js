@@ -16,9 +16,12 @@ const schema = yup.object().shape({
   password: yup.string().required("Password is a required field"),
 });
 
-const SignIn = () => {
+const SignIn = ({ handleClosePopup, ...props }) => {
   const [loading, setLoading] = useState(false);
 
+  const handleClose = () => {
+    handleClosePopup();
+  };
   const handleBackToShop = async () => {
     window.location.href = window.location.origin;
   };
@@ -43,6 +46,7 @@ const SignIn = () => {
     const { phone_number, password } = data;
 
     const { phone_code, national_number } = buildPhoneParam(phone_number);
+
     const loginData = {
       phone_code,
       phone_number: national_number,
@@ -51,7 +55,7 @@ const SignIn = () => {
 
     try {
       const { data } = await webApi.loginAccount(loginData);
-
+      // console.log(data.status);
       if (!data || data?.status !== "success") {
         Toast({
           method: "error",
@@ -62,6 +66,8 @@ const SignIn = () => {
         method: "success",
         subtitle: "Login successfully.",
       });
+      handleClose();
+      window.location.reload();
     } catch (err) {
       Toast({
         method: "error",

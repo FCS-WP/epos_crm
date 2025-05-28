@@ -10,6 +10,8 @@ namespace EPOS_CRM\Src\Web;
 
 defined('ABSPATH') or die();
 
+use EPOS_CRM\Utils\Woo_Session_Handler;
+
 class Epos_Crm_Web
 {
   protected static $_instance = null;
@@ -43,7 +45,6 @@ class Epos_Crm_Web
     return;
   }
 
-
   public function booking_assets()
   {
     // if (!is_archive() && !is_single() && !is_checkout()) return;
@@ -62,7 +63,12 @@ class Epos_Crm_Web
 
   public function epos_crm_login_form_callback($atts)
   {
+    $session = new Woo_Session_Handler;
+
+    if ($session->get('epos_customer_data')) return;
+
     $site_name = get_option('blogname') ?? "EPOS";
+
     return '<div id="epos_crm_login_form" data-site-name="' . $site_name . '"></div>';
   }
 
@@ -70,5 +76,8 @@ class Epos_Crm_Web
   {
     if (!is_checkout()) return;
     echo do_shortcode('[epos_crm_login_form]');
+    $session = new Woo_Session_Handler;
+
+    $session->destroy('epos_customer_data');
   }
 }
