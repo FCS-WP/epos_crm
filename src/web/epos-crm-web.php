@@ -6,19 +6,16 @@
  *
  */
 
-namespace Zippy_Booking\Src\Web;
+namespace EPOS_CRM\Src\Web;
 
 defined('ABSPATH') or die();
 
-use Zippy_Booking\Utils\Zippy_Utils_Core;
-use DateTime;
-
-class Zippy_Booking_Web
+class Epos_Crm_Web
 {
   protected static $_instance = null;
 
   /**
-   * @return Zippy_Booking_Web
+   * @return Epos_Crm_Web
    */
 
   public static function get_instance()
@@ -31,29 +28,18 @@ class Zippy_Booking_Web
 
   public function __construct()
   {
-    /* Set timezone SG */
-    date_default_timezone_set('Asia/Singapore');
 
     /* Init Function */
-    // add_action('init', array($this, 'function_init'));
-    add_action('wp_head', array($this, 'zippy_lightbox_flatsome'));
+    add_shortcode('epos_crm_login_form', array($this, 'epos_crm_login_form_callback'));
 
-    /* Short Code Take Away Function */
-    add_shortcode('form_take_away', array($this, 'form_take_away'));
-
-    /* Short Code Delivery Function */
-    add_shortcode('form_delivery', array($this, 'form_delivery'));
-
-    add_shortcode('zippy_form', array($this, 'zippy_form'));
-
-    
-    add_shortcode('pickup_date_calander', array($this, 'pickup_date_calander_callback'));
+    add_action('wp_footer', array($this, 'render_login_form'));
 
     /* Booking Assets  */
     add_action('wp_enqueue_scripts', array($this, 'booking_assets'));
   }
 
-  public function function_init(){
+  public function function_init()
+  {
     return;
   }
 
@@ -74,8 +60,15 @@ class Zippy_Booking_Web
     ));
   }
 
-  public function zippy_form($atts) 
+  public function epos_crm_login_form_callback($atts)
   {
-    return '<div id="zippy-form"></div>'; 
+    $site_name = get_option('blogname') ?? "EPOS";
+    return '<div id="epos_crm_login_form" data-site-name="' . $site_name . '"></div>';
+  }
+
+  public function render_login_form()
+  {
+    if (!is_checkout()) return;
+    echo do_shortcode('[epos_crm_login_form]');
   }
 }

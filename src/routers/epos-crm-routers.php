@@ -11,6 +11,7 @@ namespace EPOS_CRM\Src\Routers;
 defined('ABSPATH') or die();
 
 use EPOS_CRM\Src\Routers\General\General_Routers;
+use EPOS_CRM\Src\Routers\Customers\Customer_Routers;
 
 
 class Epos_Crm_Routers
@@ -32,5 +33,6 @@ class Epos_Crm_Routers
   public function __construct()
   {
     General_Routers::get_instance();
+    Customer_Routers::get_instance();
   }
 }
