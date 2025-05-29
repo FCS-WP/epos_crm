@@ -4,7 +4,6 @@ import { MuiTelInput } from "mui-tel-input";
 import { Typography } from "@mui/material";
 
 const PhoneField = ({ label, name, control, error, ...inputProps }) => {
-  // const phoneRef = useRef();
   return (
     <div>
       {label && (
@@ -21,6 +20,7 @@ const PhoneField = ({ label, name, control, error, ...inputProps }) => {
             {...fieldProps}
             {...inputProps}
             inputRef={fieldRef}
+            autoComplete="phone"
             defaultCountry="SG"
             fullWidth
             size="small"

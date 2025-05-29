@@ -18,6 +18,7 @@ const InputField = ({ label, name, control, error, ...inputProps }) => {
           <TextField
             {...field}
             {...inputProps}
+            autoComplete="off"
             fullWidth
             size="small"
             error={!!error}

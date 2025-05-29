@@ -75,9 +75,10 @@ class Epos_Crm_Web
   public function render_login_form()
   {
     if (!is_checkout()) return;
-    echo do_shortcode('[epos_crm_login_form]');
-    $session = new Woo_Session_Handler;
 
+    echo do_shortcode('[epos_crm_login_form]');
+
+    $session = new Woo_Session_Handler;
     $session->destroy('epos_customer_data');
   }
 }

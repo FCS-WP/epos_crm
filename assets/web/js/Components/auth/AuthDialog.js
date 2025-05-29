@@ -12,6 +12,7 @@ const AuthDialog = ({ open, onClose }) => {
   const handleOnClose = () => {
     onClose();
   };
+
   return (
     <Dialog
       open={open}
@@ -50,10 +51,10 @@ const AuthDialog = ({ open, onClose }) => {
         </Tabs>
         {tab === 1 ? (
           <>
-            <SignUp />
+            <SignUp setTab={setTab} />
           </>
         ) : (
-          <SignIn handleClosePopup={handleOnClose}  />
+          <SignIn handleClosePopup={handleOnClose} />
         )}
       </DialogContent>
     </Dialog>

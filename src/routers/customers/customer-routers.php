@@ -47,5 +47,12 @@ class Customer_Routers
       'permission_callback' => array(Epos_Crm_Permission::class, 'zippy_permission_callback'),
 
     ));
+    register_rest_route(EPOS_CRM_API_NAMESPACE, '/customers/register', array(
+      'methods' => 'POST',
+      'callback' => [Epos_Customer_controller::class, 'register'],
+      'args' => Customer_Api_Model::login_args(),
+      'permission_callback' => array(Epos_Crm_Permission::class, 'zippy_permission_callback'),
+
+    ));
   }
 }

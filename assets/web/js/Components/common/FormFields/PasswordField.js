@@ -30,6 +30,7 @@ const PasswordField = ({ label, name, control, error, ...inputProps }) => {
             <OutlinedInput
               {...field}
               type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
