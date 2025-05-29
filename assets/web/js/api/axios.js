@@ -13,7 +13,7 @@ export const makeRequest = async (
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
   const config = {
-    url: "zippy-addons/v1" + endpoint,
+    url: "/epos-crm/v1" + endpoint,
     params: params,
     method: method,
     headers: headers,

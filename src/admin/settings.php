@@ -32,12 +32,25 @@ class Settings
       return;
     }
     add_filter('woocommerce_get_settings_pages', [$this, 'woo_setting_tab']);
+    add_action('admin_enqueue_scripts', array($this, 'admin_assets'));
   }
 
   public function woo_setting_tab($settings)
   {
 
-      $settings[] = new Woo_Settings();
-      return $settings;
+    $settings[] = new Woo_Settings();
+    return $settings;
+  }
+
+  public function admin_assets()
+  {
+    $version = time();
+    $current_user_id = get_current_user_id();
+    // Pass the user ID to the script
+    wp_enqueue_script('admin-crm-js', EPOS_CRM_URL . '/assets/dist/js/admin.min.js', [], $version, true);
+    wp_enqueue_style('epos-crm-css', EPOS_CRM_URL . '/assets/dist/css/admin.min.css', [], $version);
+    wp_localize_script('current-id', 'admin_id', array(
+      'userID' => $current_user_id,
+    ));
   }
 }

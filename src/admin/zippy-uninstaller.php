@@ -13,32 +13,31 @@ defined('ABSPATH') or die();
 class Zippy_Uninstaller
 {
 
-  public static function uninstall(){
-    global $wpdb;
+  public static function uninstall()
+  {
+    // global $wpdb;
 
-    // DROP tables
+    // // DROP tables
 
-    $table_names = [
-      "bookings",
-      "booking_configs",
-      "products_booking",
-      "zippy_booking_log",
-    ];
+    // $table_names = [
+    //   "bookings",
+    //   "booking_configs",
+    //   "products_booking",
+    //   "zippy_booking_log",
+    // ];
 
-    foreach ($table_names as $name) {
-      $table_name = $wpdb->prefix . $name;
-      $wpdb->query("DROP TABLE IF EXISTS $table_name");
-    }
+    // foreach ($table_names as $name) {
+    //   $table_name = $wpdb->prefix . $name;
+    //   $wpdb->query("DROP TABLE IF EXISTS $table_name");
+    // }
 
 
     // DELETE options
     $options = [
-      "zippy_booking_api_token",
-      "store_email",
-      "default_booking_status",
-      "booking_type",
-      "allow_overlap",
-      "duration",
+      "epos_be_url",
+      "consent_pdpa",
+      "epos_crm_auth_error",
+      "epos_crm_token_key",
     ];
     foreach ($options as $opt) {
       delete_option($opt);
