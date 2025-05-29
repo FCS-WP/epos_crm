@@ -20,19 +20,24 @@ import PhoneField from "../common/FormFields/PhoneField";
 import InputField from "../common/FormFields/InputField";
 
 const schema = yup.object().shape({
-  full_name: yup.string().required("Full name is required"),
+  full_name: yup.string().required("Full name is a required field"),
   phone_number: yup.string().required("Phone Number is a required field"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  address: yup.string().required("Address is required"),
+  email: yup
+    .string()
+    .email("Invalid email")
+    .required("Email is a required field"),
+  address: yup.string().required("Address is a required field"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
-    .required(),
+    .required("Password is a required field"),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm password is required"),
-  accepted: yup.bool().oneOf([true], "You must accept the terms"),
+    .oneOf([yup.ref("password")], "Passwords doesn't match")
+    .required("Confirm password is a required field"),
+  accepted: yup
+    .bool()
+    .oneOf([true], "Please tick the checkbox(consent PDPA) above to continue"),
 });
 
 const SignUp = ({ setTab, ...props }) => {
@@ -119,6 +124,7 @@ const SignUp = ({ setTab, ...props }) => {
               name="full_name"
               control={control}
               error={errors.full_name}
+              required={true}
             />
           </Grid>
 
@@ -137,6 +143,7 @@ const SignUp = ({ setTab, ...props }) => {
               name="email"
               control={control}
               error={errors.email}
+              required={true}
             />
           </Grid>
 
@@ -144,8 +151,10 @@ const SignUp = ({ setTab, ...props }) => {
             <InputField
               label="Address"
               name="address"
+              multiline={true}
               control={control}
               error={errors.address}
+              required={true}
             />
           </Grid>
 

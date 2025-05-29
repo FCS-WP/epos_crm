@@ -9,6 +9,7 @@ const PhoneField = ({ label, name, control, error, ...inputProps }) => {
       {label && (
         <Typography className="input-label" gutterBottom>
           {label}
+          {<span style={{ color: "#CC0000" }}> *</span>}
         </Typography>
       )}
       <Controller

@@ -24,11 +24,16 @@ const AuthDialog = ({ open, onClose }) => {
       maxWidth="xs"
       sx={{
         padding: "0",
+        margin: "0",
       }}
       className="epos-crm-form"
     >
-      <DialogContent>
-        <img src={eposLogo} />
+      <DialogContent
+        sx={{
+          padding: "20px 12px",
+        }}
+      >
+        <img style={{ width: "150px" }} src={eposLogo} alt="EPOS Logo" />
         <Tabs
           sx={{ mb: 3 }}
           value={tab}

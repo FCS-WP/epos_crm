@@ -34,7 +34,7 @@ class Epos_Crm_Web
     /* Init Function */
     add_shortcode('epos_crm_login_form', array($this, 'epos_crm_login_form_callback'));
 
-    add_action('wp_footer', array($this, 'render_login_form'));
+    add_action('woocommerce_after_checkout_form', array($this, 'render_login_form'));
 
     /* Booking Assets  */
     add_action('wp_enqueue_scripts', array($this, 'booking_assets'));

@@ -55,7 +55,6 @@ const SignIn = ({ handleClosePopup, ...props }) => {
 
     try {
       const { data } = await webApi.loginAccount(loginData);
-      // console.log(data.status);
       if (!data || data?.status !== "success") {
         Toast({
           method: "error",

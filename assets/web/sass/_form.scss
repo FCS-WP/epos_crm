@@ -58,9 +58,15 @@
       font-weight: 600;
       font-size: 12px !important;
     }
-    
-    &.checkbox{
+
+    &.checkbox {
       font-weight: 600;
+    }
+  }
+
+  .MuiPaper-root {
+    @include only-mobile {
+      margin: 12px;
     }
   }
 }
