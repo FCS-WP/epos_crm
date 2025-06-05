@@ -55,18 +55,20 @@ const SignIn = ({ handleClosePopup, ...props }) => {
 
     try {
       const { data } = await webApi.loginAccount(loginData);
-      if (!data || data?.status !== "success") {
+      if (data && data?.status == "success") {
+        Toast({
+          method: "success",
+          subtitle: "Login successfully.",
+        });
+
+        handleClose();
+        window.location.reload();
+      } else {
         Toast({
           method: "error",
-          subtitle: "Invalid Phone number or password",
+          subtitle: data?.errors,
         });
       }
-      Toast({
-        method: "success",
-        subtitle: "Login successfully.",
-      });
-      handleClose();
-      window.location.reload();
     } catch (err) {
       Toast({
         method: "error",

@@ -20,7 +20,7 @@ class Customer_Api_Model
       'phone_number' => array(
         'required' => true,
         'validate_callback' => function ($param) {
-          return is_string($param) && preg_match('/^\d{10,15}$/', $param); // basic phone validation
+          return is_string($param);// basic phone validation
         },
       ),
       'password' => array(

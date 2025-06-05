@@ -96,9 +96,22 @@ class Epos_Customer_controller
         'data' => json_decode($login->getBody())->data
       );
     } catch (ClientException $e) {
+      $responseBody = $e->getResponse()->getBody()->getContents();
+      $decoded = json_decode($responseBody, true);
+
+      $firstError = 'An error occurred';
+
+      if (isset($decoded['errors']) && is_array($decoded['errors'])) {
+        foreach ($decoded['errors'] as $errorGroup) {
+          if (isset($errorGroup['detail'])) {
+            $firstError = $errorGroup['detail'];
+            break;
+          }
+        }
+      }
       $response = array(
         'status' => $e->getResponse()->getStatusCode(),
-        'message' => 'Login failed',
+        'errors' => $firstError,
       );
     } catch (ConnectException $e) {
       $response = array(
