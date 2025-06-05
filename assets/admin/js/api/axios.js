@@ -4,9 +4,9 @@ export const makeRequest = async (
   endpoint,
   params = {},
   method = "GET", // Default method set to GET
-  token = "FEhI30q7ySHtMfzvSDo6RkxZUDVaQ1BBU3lBcGhYS3BrQStIUT09"
+  token = process.env.EPOS_API_KEY
 ) => {
-  const baseURL = "/wp-json/zippy-addons/v1";
+  const baseURL = "/wp-json/epos-crm/v1";
   const api = axios.create({ baseURL });
 
   // Build headers
@@ -29,7 +29,7 @@ export const makeRequest = async (
 
   try {
     const response = await api.request(config);
-    return { data: response.data };
+    return response.data;
   } catch (error) {
     const errorMessage =
       error?.response?.data?.message ||

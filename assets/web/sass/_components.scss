@@ -1,0 +1,86 @@
+.MuiInputBase-root {
+  border: 5px solid transparent !important;
+  border-radius: $radius !important;
+  &.Mui-focused {
+    border: 5px solid $lighterBoder2 !important;
+  }
+  .MuiInputBase-input {
+    border: 0px !important;
+    border-radius: $radius !important;
+    background-color: $input !important;
+    padding: 12px !important;
+  }
+  &.MuiOutlinedInput-root {
+    &.Mui-error {
+      border: 1px solid $error !important;
+    }
+  }
+}
+p.MuiFormHelperText-root {
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+.epos-btn.MuiButtonBase-root {
+  border-radius: 12px !important;
+  background-color: $primary !important;
+  padding: 12px !important;
+  width: 100% !important;
+  transition: $transition;
+  text-transform: capitalize !important;
+  &:hover {
+    color: #fff;
+    background-color: $hover !important;
+  }
+  &:focus {
+    color: #fff;
+    background-color: $hover !important;
+  }
+  &.MuiButton-outline {
+    background-color: transparent !important;
+    color: $primary !important;
+    border: 1px solid $primary !important;
+  }
+}
+
+.epos-error-msg {
+  font-size: 12px !important;
+  margin-top: 4px !important;
+  font-style: italic !important;
+}
+
+.epos-phone-field button {
+  padding: 0px !important;
+  max-height: 32px;
+  background: transparent !important;
+}
+
+//Toast
+.Toastify__toast-container {
+  z-index: 99999;
+  .Toastify__toast {
+    z-index: 99999;
+    &--success {
+      color: var(--toastify-color-progress-success);
+      box-shadow: -8px 0px var(--toastify-color-progress-success);
+    }
+
+    &--error {
+      box-shadow: -8px 0px var(--toastify-color-error);
+      color: var(--toastify-color-error);
+    }
+    &--warning {
+      box-shadow: -8px 0px var(--toastify-color-warning);
+      color: var(--toastify-color-warning);
+    }
+  }
+  button.Toastify__close-button {
+    padding: 12px !important;
+    right: 20px;
+    transform: translateY(-50%);
+    top: 50% !important;
+    border: 0px !important;
+    background: transparent !important;
+    color: #000 !important;
+  }
+}
