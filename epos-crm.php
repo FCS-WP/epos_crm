@@ -82,5 +82,4 @@ add_action('plugins_loaded', function () {
   Epos_Crm_Routers::get_instance();
   Epos_Crm_Web::get_instance();
   Epos_Crm_Woocommerce::get_instance();
-
 });

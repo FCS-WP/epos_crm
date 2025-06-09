@@ -10,9 +10,10 @@ namespace EPOS_CRM\Src\Woocommerce;
 
 defined('ABSPATH') or die();
 
-use EPOS_CRM\Utils\Zippy_Utils_Core;
+use EPOS_CRM\Utils\EPOS_Helper;
 
 use EPOS_CRM\Utils\Woo_Session_Handler;
+use EPOS_CRM\Src\Woocommerce\Orders\Epos_Crm_Orders;
 
 class Epos_Crm_Woocommerce
 {
@@ -40,6 +41,7 @@ class Epos_Crm_Woocommerce
 
     $this->set_hooks();
 
+    Epos_Crm_Orders::get_instance();
     /* Update Checkout After Applied Coupon */
     add_action('trigger_update_checkout', array($this, 'trigger_update_checkout_callback'), 1, 3);
     // EPOS Prefill Customer Infor
@@ -93,6 +95,7 @@ class Epos_Crm_Woocommerce
 
   public function custom_override_checkout_fields($fields)
   {
+    $fields['billing']['epos_customer_id'] = '';
     unset($fields['billing']['billing_company']);
     return $fields;
   }
@@ -110,7 +113,7 @@ class Epos_Crm_Woocommerce
 
     $session = new Woo_Session_Handler;
 
-    $session_data = $session->get('epos_customer_data')->attributes;
+    $session_data = !empty($session->get('epos_customer_data')) ? $session->get('epos_customer_data') : '';
 
     if (!$session_data || !is_object($session_data)) {
       return $value;
@@ -118,23 +121,25 @@ class Epos_Crm_Woocommerce
 
     switch ($input) {
       case 'billing_first_name':
-        return $session_data->full_name ?? $value;
+        return EPOS_Helper::split_full_name($session_data->attributes->full_name)['first_name']  ?? $value;
       case 'billing_last_name':
-        return $session_data->full_name ?? $value;
+        return  EPOS_Helper::split_full_name($session_data->attributes->full_name)['last_name'] ?? $value;
       case 'billing_email':
-        return $session_data->email ?? $value;
+        return $session_data->attributes->email ?? $value;
+      case 'epos_customer_id':
+        return $session_data->id ?? $value;
       case 'billing_phone':
-        return $session_data->phone_number ?? $value;
+        return $session_data->attributes->phone_number ?? $value;
       case 'billing_address_1':
-        return $session_data->address_street_1 ?? $value;
+        return $session_data->attributes->address_street_1 ?? $value;
       case 'billing_address_2':
-        return $session_data->address_street_2 ?? $value;
+        return $session_data->attributes->address_street_2 ?? $value;
       case 'billing_postcode':
-        return $session_data->address_postal_code ?? $value;
+        return $session_data->attributes->address_postal_code ?? $value;
       case 'billing_city':
-        return $session_data->address_city ?? $value;
+        return $session_data->attributes->address_city ?? $value;
       case 'billing_country':
-        return $session_data->address_country ?? $value;
+        return $session_data->attributes->address_country ?? $value;
       default:
         return $value;
     }
