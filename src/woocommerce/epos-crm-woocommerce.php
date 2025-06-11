@@ -113,33 +113,34 @@ class Epos_Crm_Woocommerce
 
     $session = new Woo_Session_Handler;
 
-    $session_data = !empty($session->get('epos_customer_data')) ? $session->get('epos_customer_data') : '';
+    $session_user_data = !empty($session->get('epos_customer_data')) ? $session->get('epos_customer_data') : '';
+    $session_user_id = !empty($session->get('epos_customer_id')) ? $session->get('epos_customer_id') : '';
 
-    if (!$session_data || !is_object($session_data)) {
+    if (!$session_user_data || !is_object($session_user_data)) {
       return $value;
     }
 
     switch ($input) {
       case 'billing_first_name':
-        return EPOS_Helper::split_full_name($session_data->attributes->full_name)['first_name']  ?? $value;
+        return EPOS_Helper::split_full_name($session_user_data->full_name)['first_name']  ?? $value;
       case 'billing_last_name':
-        return  EPOS_Helper::split_full_name($session_data->attributes->full_name)['last_name'] ?? $value;
+        return  EPOS_Helper::split_full_name($session_user_data->full_name)['last_name'] ?? $value;
       case 'billing_email':
-        return $session_data->attributes->email ?? $value;
+        return $session_user_data->email ?? $value;
       case 'epos_customer_id':
-        return $session_data->id ?? $value;
+        return $session_user_id ?? $value;
       case 'billing_phone':
-        return $session_data->attributes->phone_number ?? $value;
+        return $session_user_data->phone_number ?? $value;
       case 'billing_address_1':
-        return $session_data->attributes->address_street_1 ?? $value;
+        return $session_user_data->address_street_1 ?? $value;
       case 'billing_address_2':
-        return $session_data->attributes->address_street_2 ?? $value;
+        return $session_user_data->address_street_2 ?? $value;
       case 'billing_postcode':
-        return $session_data->attributes->address_postal_code ?? $value;
+        return $session_user_data->address_postal_code ?? $value;
       case 'billing_city':
-        return $session_data->attributes->address_city ?? $value;
+        return $session_user_data->address_city ?? $value;
       case 'billing_country':
-        return $session_data->attributes->address_country ?? $value;
+        return $session_user_data->address_country ?? $value;
       default:
         return $value;
     }

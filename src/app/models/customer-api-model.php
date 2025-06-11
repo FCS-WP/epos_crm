@@ -20,13 +20,49 @@ class Customer_Api_Model
       'phone_number' => array(
         'required' => true,
         'validate_callback' => function ($param) {
-          return is_string($param);// basic phone validation
+          return is_string($param); // basic phone validation
         },
       ),
       'password' => array(
         'required' => true,
         'validate_callback' => function ($param) {
           return is_string($param) && strlen($param) >= 6;
+        },
+      ),
+    );
+  }
+
+  public static function register_args()
+  {
+    return array(
+      'phone_number' => array(
+        'required' => true,
+        'validate_callback' => function ($param) {
+          return is_string($param); // basic phone validation
+        },
+      ),
+      'password' => array(
+        'required' => true,
+        'validate_callback' => function ($param) {
+          return is_string($param) && strlen($param) >= 6;
+        },
+      ),
+    );
+  }
+
+  public static function update_args()
+  {
+    return array(
+      'id' => array(
+        'required' => true,
+        'validate_callback' => function ($param) {
+          return is_string($param);
+        },
+      ),
+      'customer' => array(
+        'required' => true,
+        'validate_callback' => function ($param) {
+          return is_array($param);
         },
       ),
     );

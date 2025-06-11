@@ -80,5 +80,6 @@ class Epos_Crm_Web
 
     $session = new Woo_Session_Handler;
     $session->destroy('epos_customer_data');
+    $session->destroy('epos_customer_id');
   }
 }

@@ -10,7 +10,9 @@ import { Button, Box, Typography, Grid } from "@mui/material";
 import PasswordField from "../common/FormFields/PasswordField";
 import Toast from "../common/notifications/toast";
 import PhoneField from "../common/FormFields/PhoneField";
-const schema = yup.object().shape({
+import UpdateEmail from "./UpdateEmail";
+
+const loginSchema = yup.object().shape({
   phone_number: yup.string().required("Phone Number is a required field"),
 
   password: yup.string().required("Password is a required field"),
@@ -18,10 +20,14 @@ const schema = yup.object().shape({
 
 const SignIn = ({ handleClosePopup, ...props }) => {
   const [loading, setLoading] = useState(false);
+  const [isMissingEmail, setIsMissingEmail] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const handleClose = () => {
+    reset();
     handleClosePopup();
   };
+
   const handleBackToShop = async () => {
     window.location.href = window.location.origin;
   };
@@ -55,14 +61,25 @@ const SignIn = ({ handleClosePopup, ...props }) => {
 
     try {
       const { data } = await webApi.loginAccount(loginData);
-      if (data && data?.status == "success") {
-        Toast({
-          method: "success",
-          subtitle: "Login successfully.",
-        });
 
-        handleClose();
-        window.location.reload();
+      if (data && data?.status == "success") {
+        if (data?.data?.attributes?.email == "") {
+          Toast({
+            method: "warning",
+            subtitle: "Please update your email address to continue",
+          });
+
+          setIsMissingEmail(true);
+          setCurrentUser(data?.data.id);
+        } else {
+          Toast({
+            method: "success",
+            subtitle: "Login successfully.",
+          });
+
+          handleClose();
+          window.location.reload();
+        }
       } else {
         Toast({
           method: "error",
@@ -83,7 +100,14 @@ const SignIn = ({ handleClosePopup, ...props }) => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: yupResolver(schema) });
+    reset,
+  } = useForm({ resolver: yupResolver(loginSchema), mode: "onChange" });
+
+  if (isMissingEmail) {
+    return (
+      <UpdateEmail currentUser={currentUser} handleClosePopup={handleClose} />
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>

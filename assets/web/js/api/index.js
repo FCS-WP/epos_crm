@@ -9,6 +9,9 @@ export const webApi = {
   async loginAccount(params) {
     return await makeRequest("/customers/login", params, "POST");
   },
+  async updateAccount(params) {
+    return await makeRequest("/customers", params, "PATCH");
+  },
   async registerAccount(params) {
     return await makeRequest("/customers/register", params, "POST");
   },
