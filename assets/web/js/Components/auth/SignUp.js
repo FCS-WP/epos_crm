@@ -18,6 +18,8 @@ import PasswordField from "../common/FormFields/PasswordField";
 import Toast from "../common/notifications/toast";
 import PhoneField from "../common/FormFields/PhoneField";
 import InputField from "../common/FormFields/InputField";
+import SelectCountryField from "../common/FormFields/SelectCountryField";
+import countryList from "../../Helper/countries";
 
 const schema = yup.object().shape({
   full_name: yup.string().required("Full name is a required field"),
@@ -66,9 +68,9 @@ const SignUp = ({ setTab, ...props }) => {
       };
     }
   };
+
   const onSubmit = async (data) => {
     setLoading(true);
-
     const { phone_code, national_number } = buildPhoneParam(data.phone_number);
     const registerData = {
       ...data,
@@ -166,11 +168,13 @@ const SignUp = ({ setTab, ...props }) => {
           </Grid>
 
           <Grid size={12}>
-            <InputField
+            <SelectCountryField
               label="Country"
               name="country"
+              defaultValue="SG"
               control={control}
               error={errors.country}
+              data={countryList}
             />
           </Grid>
 
