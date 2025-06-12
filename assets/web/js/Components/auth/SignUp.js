@@ -26,7 +26,10 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email")
     .required("Email is a required field"),
-  address: yup.string().required("Address is a required field"),
+  address_1: yup.string().required("Address is a required field"),
+  address_2: yup.string(),
+  country: yup.string().required("Country is a required field"),
+  city: yup.string(),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -45,7 +48,7 @@ const SignUp = ({ setTab, ...props }) => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: yupResolver(schema) });
+  } = useForm({ resolver: yupResolver(schema), method: "onChange" });
 
   const [loading, setLoading] = useState(false);
   const [siteName, setSiteName] = useState("");
@@ -66,15 +69,12 @@ const SignUp = ({ setTab, ...props }) => {
   const onSubmit = async (data) => {
     setLoading(true);
 
-    const { full_name, phone_number, email, password, confirmPassword } = data;
-    const { phone_code, national_number } = buildPhoneParam(phone_number);
+    const { phone_code, national_number } = buildPhoneParam(data.phone_number);
     const registerData = {
-      full_name,
+      ...data,
       phone_code,
       phone_number: national_number,
-      email,
-      password,
-      confirm_password: confirmPassword,
+      confirm_password: data.confirmPassword,
     };
 
     try {
@@ -91,7 +91,6 @@ const SignUp = ({ setTab, ...props }) => {
           subtitle: data?.errors,
         });
       }
-      // reset();
     } catch (err) {
       Toast({
         method: "error",
@@ -149,12 +148,38 @@ const SignUp = ({ setTab, ...props }) => {
 
           <Grid size={12}>
             <InputField
-              label="Address"
-              name="address"
-              multiline={true}
+              label="Address 1"
+              name="address_1"
               control={control}
-              error={errors.address}
+              error={errors.address_1}
               required={true}
+            />
+          </Grid>
+
+          <Grid size={12}>
+            <InputField
+              label="Address 2"
+              name="address_2"
+              control={control}
+              error={errors.address_2}
+            />
+          </Grid>
+
+          <Grid size={12}>
+            <InputField
+              label="Country"
+              name="country"
+              control={control}
+              error={errors.country}
+            />
+          </Grid>
+
+          <Grid size={12}>
+            <InputField
+              label="City"
+              name="city"
+              control={control}
+              error={errors.city}
             />
           </Grid>
 
