@@ -1,0 +1,77 @@
+.epos-crm-form {
+  // Tab
+  .epos-tab-form {
+    .MuiTabs-indicator {
+      display: none;
+    }
+    button.MuiTab-root {
+      background-color: $primary-blur;
+      transition: all 0.2s linear;
+      color: $primary;
+      &.Mui-selected {
+        color: #fff !important;
+        background-color: $primary !important;
+      }
+    }
+  }
+  // Body tab
+  .get-started {
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
+    font-size: 28px !important;
+    line-height: 32px !important;
+    color: #171c28 !important;
+    text-transform: capitalize !important;
+    font-weight: 700 !important;
+    &.update-email {
+      font-size: 16px !important;
+      line-height: 24px !important;
+      text-transform: initial !important;
+    }
+  }
+  .input-label {
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
+    font-weight: 600;
+    font-size: 14px !important;
+    color: #4d5362 !important;
+  }
+}
+
+.epos-crm-form {
+  button.MuiButtonBase-root {
+    background-color: $primary;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    border: 0px !important;
+    text-transform: capitalize !important;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
+    font-size: 16px !important;
+    line-height: 24px !important;
+    font-weight: 600 !important;
+  }
+  .hide-password {
+    padding: 0px;
+    background: transparent !important;
+    color: #707888 !important;
+  }
+
+  .epos-term {
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
+    font-weight: 500;
+    color: #4d5362 !important;
+    font-size: 12px !important;
+    .admin-name {
+      font-weight: 600;
+      font-size: 12px !important;
+    }
+
+    &.checkbox {
+      font-weight: 600;
+    }
+  }
+
+  .MuiPaper-root {
+    @include only-mobile {
+      margin: 12px;
+    }
+  }
+}

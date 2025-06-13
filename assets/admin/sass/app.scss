@@ -1,2 +1,22 @@
 //
 @import "variables";
+.Mui-error {
+  color: #cc0000 !important;
+  input {
+    border: 1px solid #cc0000;
+  }
+}
+.epos-crm-wrapper {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 14px;
+}
+.epos-crm-sucess {
+  background: #28a745;
+  padding: 4px 12px;
+  font-weight: 400;
+  color: white;
+  border-radius: 2px;
+}

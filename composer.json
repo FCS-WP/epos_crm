@@ -1,5 +1,5 @@
 {
     "require": {
-        "tebazil/db-seeder": "^1.0"
+        "guzzlehttp/guzzle": "^7.0"
     }
 }
