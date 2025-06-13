@@ -74,7 +74,7 @@ class Epos_Crm_Web
 
   public function render_login_form()
   {
-    if (!is_checkout()) return;
+    if (!is_checkout() || empty(get_option('epos_crm_token_key'))) return;
 
     echo do_shortcode('[epos_crm_login_form]');
 

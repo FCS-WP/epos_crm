@@ -14,10 +14,14 @@ class EPOS_Helper
 {
   public static function split_full_name($name)
   {
-    if (empty($name)) return;
+    if (empty($name)) return null;
+
     $name = trim($name);
-    $first_name = (strpos($name, ' ') === false) ? '' : preg_replace('#.*\s([\w-]*)$#', '$1', $name);
-    $last_name = trim(preg_replace('#' . preg_quote($first_name, '#') . '#', '', $name));
+    $parts = explode(' ', $name);
+
+    $first_name = array_shift($parts);
+    $last_name = implode(' ', $parts);
+
     return array(
       'first_name' => $first_name,
       'last_name' => $last_name

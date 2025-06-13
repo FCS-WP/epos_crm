@@ -75,7 +75,6 @@ class Epos_Customer_controller
         $session = new Woo_Session_Handler;
         $session->set(self::$customer_key, $data);
         $session->set(self::$customer_id, $data->id);
-
       }
     }
 
@@ -94,7 +93,11 @@ class Epos_Customer_controller
         "email" => ["required" => true, "data_type" => "string"],
         "password" => ["required" => true, "data_type" => "string"],
         "full_name" => ["required" => true, "data_type" => "string"],
-        "address_street_1" => ["required" => false, "data_type" => "string"],
+        "address_street_1" => ["required" => true, "data_type" => "string"],
+        "address_street_2" => ["required" => false, "data_type" => "string"],
+        "address_country" => ["required" => true, "data_type" => "string"],
+        "address_city" => ["required" => false, "data_type" => "string"],
+        "address_postal_code" => ["required" => true, "data_type" => "string"],
       ];
 
       // Validate Request Fields
@@ -110,8 +113,13 @@ class Epos_Customer_controller
           "email" => sanitize_text_field($request["email"]),
           "phone_code" => sanitize_text_field($request["phone_code"]),
           "phone_number" => sanitize_text_field($request["phone_number"]),
+          "password" => sanitize_text_field($request["password"]),
           "address_street_1" => sanitize_text_field($request["address_street_1"]),
-          "password" => sanitize_text_field($request["password"])
+          "address_street_2" => sanitize_text_field($request["address_street_2"]),
+          "address_country" => sanitize_text_field($request["address_country"]),
+          "address_city" => sanitize_text_field($request["address_city"]),
+          "address_postal_code" => sanitize_text_field($request["address_postal_code"]),
+
         ]
       ];
 

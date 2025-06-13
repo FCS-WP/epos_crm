@@ -28,10 +28,11 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email")
     .required("Email is a required field"),
-  address_1: yup.string().required("Address is a required field"),
-  address_2: yup.string(),
-  country: yup.string().required("Country is a required field"),
-  city: yup.string(),
+  address_street_1: yup.string().required("Address is a required field"),
+  address_street_2: yup.string(),
+  address_country: yup.string().required("Country is a required field"),
+  address_postal_code: yup.string().required("Postal code is a required field"),
+  address_city: yup.string(),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -151,9 +152,9 @@ const SignUp = ({ setTab, ...props }) => {
           <Grid size={12}>
             <InputField
               label="Address 1"
-              name="address_1"
+              name="address_street_1"
               control={control}
-              error={errors.address_1}
+              error={errors.address_street_1}
               required={true}
             />
           </Grid>
@@ -161,29 +162,40 @@ const SignUp = ({ setTab, ...props }) => {
           <Grid size={12}>
             <InputField
               label="Address 2"
-              name="address_2"
+              name="address_street_2"
               control={control}
-              error={errors.address_2}
+              error={errors.address_street_2}
             />
           </Grid>
 
           <Grid size={12}>
             <SelectCountryField
               label="Country"
-              name="country"
+              name="address_country"
               defaultValue="SG"
               control={control}
-              error={errors.country}
+              error={errors.address_country}
               data={countryList}
             />
           </Grid>
 
           <Grid size={12}>
             <InputField
-              label="City"
-              name="city"
+              label="Postal code"
+              name="address_postal_code"
               control={control}
-              error={errors.city}
+              error={errors.address_postal_code}
+              required={true}
+
+            />
+          </Grid>
+
+          <Grid size={12}>
+            <InputField
+              label="City"
+              name="address_city"
+              control={control}
+              error={errors.address_city}
             />
           </Grid>
 
