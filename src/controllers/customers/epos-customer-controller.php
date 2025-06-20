@@ -15,6 +15,7 @@ use EPOS_CRM\Src\App\Models\Zippy_Request_Validation;
 use EPOS_CRM\Src\App\Zippy_Response_Handler;
 use EPOS_CRM\Utils\Woo_Session_Handler;
 use EPOS_CRM\Src\App\Helper\Handle_Response_Errors;
+use Exception;
 
 defined('ABSPATH') or die();
 
@@ -32,7 +33,7 @@ class Epos_Customer_controller
     if (self::$client === null) {
       self::$client = new Client([
         'base_uri' => get_option('epos_be_url'),
-        'timeout'  => 6,
+        'timeout'  => 10,
       ]);
     }
   }
@@ -42,7 +43,7 @@ class Epos_Customer_controller
     if (self::$client === null) {
       self::$client = new Client([
         'base_uri' => 'https://livedevs.com',
-        'timeout'  => 6,
+        'timeout'  => 10,
       ]);
     }
   }
@@ -87,40 +88,76 @@ class Epos_Customer_controller
     self::init_client_public();
 
     try {
-      $required_fields = [
-        "phone_number" => ["required" => true, "data_type" => "string"],
-        "phone_code" => ["required" => true, "data_type" => "string"],
-        "email" => ["required" => true, "data_type" => "string"],
-        "password" => ["required" => true, "data_type" => "string"],
-        "full_name" => ["required" => true, "data_type" => "string"],
-        "address_street_1" => ["required" => true, "data_type" => "string"],
-        "address_street_2" => ["required" => false, "data_type" => "string"],
-        "address_country" => ["required" => true, "data_type" => "string"],
-        "address_city" => ["required" => false, "data_type" => "string"],
-        "address_postal_code" => ["required" => true, "data_type" => "string"],
+      $validationRules = [
+        "phone_number" => [
+          "required" => true,
+          "data_type" => "string",
+          "validation" => "phone"
+        ],
+        "phone_code" => [
+          "required" => true,
+          "data_type" => "string"
+        ],
+        "email" => [
+          "required" => true,
+          "data_type" => "string",
+          "validation" => "email"
+        ],
+        "password" => [
+          "required" => true,
+          "data_type" => "string",
+          "min_length" => 8,
+
+        ],
+        "full_name" => [
+          "required" => true,
+          "data_type" => "string",
+          "min_length" => 2
+        ],
+        "address_street_1" => [
+          "required" => true,
+          "data_type" => "string"
+        ],
+        "address_street_2" => [
+          "required" => false,
+          "data_type" => "string"
+        ],
+        "address_country" => [
+          "required" => true,
+          "data_type" => "string"
+        ],
+        "address_city" => [
+          "required" => false,
+          "data_type" => "string"
+        ],
+        "address_postal_code" => [
+          "required" => true,
+          "data_type" => "string"
+        ],
       ];
 
       // Validate Request Fields
-      $validate = Zippy_Request_Validation::validate_request($required_fields, $request);
+      $validationErrors = Zippy_Request_Validation::validate_request($validationRules, $request);
 
-      if (!empty($validate)) {
-        return Zippy_Response_Handler::error($validate);
+      if (!empty($validationErrors)) {
+        return Zippy_Response_Handler::error($validationErrors);
       }
 
-      $params = [
-        "customer" => [
-          "full_name" => sanitize_text_field($request["full_name"]),
-          "email" => sanitize_text_field($request["email"]),
-          "phone_code" => sanitize_text_field($request["phone_code"]),
-          "phone_number" => sanitize_text_field($request["phone_number"]),
-          "password" => sanitize_text_field($request["password"]),
-          "address_street_1" => sanitize_text_field($request["address_street_1"]),
-          "address_street_2" => sanitize_text_field($request["address_street_2"]),
-          "address_country" => sanitize_text_field($request["address_country"]),
-          "address_city" => sanitize_text_field($request["address_city"]),
-          "address_postal_code" => sanitize_text_field($request["address_postal_code"]),
+      $customer_data = [
+        "full_name" => sanitize_text_field($request["full_name"]),
+        "email" => sanitize_email($request["email"]),
+        "phone_code" => sanitize_text_field($request["phone_code"]),
+        "phone_number" => sanitize_text_field($request["phone_number"]),
+        "password" => sanitize_text_field($request["password"]),
+        "address_street_1" => sanitize_text_field($request["address_street_1"]),
+        "address_street_2" => sanitize_text_field($request["address_street_2"]),
+        "address_country" => sanitize_text_field($request["address_country"]),
+        "address_city" => sanitize_text_field($request["address_city"]),
+        "address_postal_code" => sanitize_text_field($request["address_postal_code"])
+      ];
 
-        ]
+      $params = [
+        "customer" => $customer_data
       ];
 
       $headers = [
@@ -129,24 +166,37 @@ class Epos_Customer_controller
         'Authorization' => get_option('epos_crm_token_key')
       ];
 
-      $login = self::$client->post("/api/v1/customers", ['headers' => $headers, 'json' => $params]);
+      $options = [
+        'headers' => $headers,
+        'json' => $params,
+      ];
 
-      $response = array(
+      $login = self::$client->post("/api/v1/customers", $options);
+
+      return [
         'status' => 'success',
         'message' => 'Register successfully',
         'data' => json_decode($login->getBody())
-      );
+      ];
     } catch (ClientException $e) {
       $responseBody = $e->getResponse()->getBody()->getContents();
       $errors = json_decode($responseBody, true);
       $response = Handle_Response_Errors::V5_API_Error_Public($e, $errors);
+
+      return $response;
     } catch (ConnectException $e) {
-      $response = array(
-        'status' => false,
-        'message' => 'Register failed',
-      );
+      return [
+        'status' => 'error',
+        'message' => 'Registration service is currently unavailable. Please try again later.',
+        'error_code' => 'service_unavailable',
+      ];
+    } catch (Exception $e) {
+      return [
+        'status' => 'error',
+        'message' => 'An unexpected error occurred during registration.',
+        'error_code' => 'internal_error',
+      ];
     }
-    return $response;
   }
 
 
@@ -156,29 +206,46 @@ class Epos_Customer_controller
     self::init_client_internal();
 
     try {
-      $required_fields = [
-        "id" => ["required" => true, "data_type" => "string"],
-        "customer" => ["required" => true, "data_type" => "array"],
+
+
+      $validationRules = [
+        "id" => [
+          "required" => true,
+          "data_type" => "string",
+        ],
+        "customer" => [
+          "required" => true,
+          "data_type" => "array",
+
+        ],
       ];
 
       // Validate Request Fields
-      $validate = Zippy_Request_Validation::validate_request($required_fields, $request);
+      $validate = Zippy_Request_Validation::validate_request($validationRules, $request);
 
       if (!empty($validate)) {
         return Zippy_Response_Handler::error($validate);
       }
 
+
       $params = [
         "customer" => $request['customer']
       ];
       $id_user = sanitize_text_field($request["id"]);
+
       $headers = [
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
         'Authorization' => get_option('epos_crm_token_key'),
       ];
 
-      $update = self::$client->patch('/api/v1/customers/' . $id_user, ['headers' => $headers, 'json' => $params]);
+      $options = [
+        'headers' => $headers,
+        'json' => $params,
+      ];
+
+      $update = self::$client->patch('/api/v1/customers/' . $id_user, $options);
+
       $response = array(
         'status' => 'success',
         'message' => 'Update successfully',
@@ -193,6 +260,12 @@ class Epos_Customer_controller
         'status' => false,
         'message' => 'Update failed',
       );
+    } catch (Exception $e) {
+      return [
+        'status' => 'error',
+        'message' => 'An unexpected error occurred during registration.',
+        'error_code' => 'internal_error',
+      ];
     }
     return $response;
   }
@@ -202,24 +275,35 @@ class Epos_Customer_controller
     self::init_client_internal();
 
     try {
-      $required_fields = [
-        "phone_number" => ["required" => true, "data_type" => "string"],
-        "password" => ["required" => true, "data_type" => "string"],
+      $validationRules = [
+        "phone_number" => [
+          "required" => true,
+          "data_type" => "string",
+          "validation" => "phone"
+        ],
+        "password" => [
+          "required" => true,
+          "data_type" => "string",
+          "min_length" => 8,
+
+        ],
       ];
 
       // Validate Request Fields
-      $validate = Zippy_Request_Validation::validate_request($required_fields, $request);
+      $validate = Zippy_Request_Validation::validate_request($validationRules, $request);
 
       if (!empty($validate)) {
         return Zippy_Response_Handler::error($validate);
       }
 
+      $login_data = [
+        'phone_number' => sanitize_text_field($request["phone_number"]),
+        'password' => sanitize_text_field($request["password"]),
+      ];
+
       $params = [
         "data" => [
-          "attributes" => [
-            'phone_number' => sanitize_text_field($request["phone_number"]),
-            'password' => sanitize_text_field($request["password"]),
-          ]
+          "attributes" => $login_data
         ]
       ];
 
@@ -228,23 +312,36 @@ class Epos_Customer_controller
         'Accept' => 'application/vnd.api+json',
       ];
 
-      $login = self::$client->post("api/modules/woocommerce/customers/login", ['headers' => $headers, 'json' => $params]);
+      $options = [
+        'headers' => $headers,
+        'json' => $params,
+      ];
+
+      $login = self::$client->post("api/modules/woocommerce/customers/login", $options);
 
       $response = array(
         'status' => 'success',
         'message' => 'Login successfully',
         'data' => json_decode($login->getBody())->data
       );
+      return $response;
     } catch (ClientException $e) {
       $responseBody = $e->getResponse()->getBody()->getContents();
       $errors = json_decode($responseBody, true);
       $response = Handle_Response_Errors::V5_API_Error_Internal($e, $errors);
+      return $response;
     } catch (ConnectException $e) {
-      $response = array(
+     return [
         'status' => false,
-        'message' => 'Login failed',
-      );
+        'message' => 'Login service is currently unavailable. Please try again later.',
+        'error_code' => 'service_unavailable',
+      ];
+    } catch (Exception $e) {
+      return [
+        'status' => 'error',
+        'message' => 'An unexpected error occurred during registration.',
+        'error_code' => 'internal_error',
+      ];
     }
-    return $response;
   }
 }
