@@ -39,6 +39,7 @@ class Zippy_Uninstaller
       "epos_crm_auth_error",
       "epos_crm_token_key",
     ];
+
     foreach ($options as $opt) {
       delete_option($opt);
     }

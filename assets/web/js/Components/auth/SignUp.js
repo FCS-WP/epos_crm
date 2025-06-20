@@ -31,7 +31,7 @@ const schema = yup.object().shape({
   address_street_1: yup.string().required("Address is a required field"),
   address_street_2: yup.string(),
   address_country: yup.string().required("Country is a required field"),
-  address_postal_code: yup.string().required("Postal code is a required field"),
+  address_postal_code: yup.number().required("Postal code is a required field"),
   address_city: yup.string(),
   password: yup
     .string()
