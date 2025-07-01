@@ -11,6 +11,7 @@ const schema = yup.object().shape({
   email: yup
     .string()
     .email("Invalid email")
+    .matches(/^[^@]+@[^@]+\.[^@]+$/, "Invalid email")
     .required("Email is a required field"),
 });
 const UpdateEmail = ({ currentUser, handleClosePopup, ...props }) => {

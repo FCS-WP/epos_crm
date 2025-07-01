@@ -23,15 +23,40 @@ import countryList from "../../Helper/countries";
 
 const schema = yup.object().shape({
   full_name: yup.string().required("Full name is a required field"),
-  phone_number: yup.string().required("Phone Number is a required field"),
+  phone_number: yup
+    .string()
+    .transform((value) => {
+      if (typeof value === "string") {
+        const local = value
+          .trim()
+          .replace(/^(\+65|65)/, "")
+          .replace(/[\s-]/g, "");
+
+        if (/^[689]\d{7}$/.test(local)) {
+          return `+65 ${local}`;
+        }
+
+        return value.trim();
+      }
+      return value;
+    })
+    .matches(
+      /^\+65\s[689]\d{7}$/,
+      "Phone number must be 8 digits starting with 6, 8, or 9 (e.g. +65 91234567)"
+    )
+    .required("Phone Number is a required field"),
   email: yup
     .string()
     .email("Invalid email")
+    .matches(/^[^@]+@[^@]+\.[^@]+$/, "Invalid email")
     .required("Email is a required field"),
+
   address_street_1: yup.string().required("Address is a required field"),
   address_street_2: yup.string(),
   address_country: yup.string().required("Country is a required field"),
-  address_postal_code: yup.number().required("Postal code is a required field"),
+  address_postal_code: yup
+    .number("Invalid postal code")
+    .required("Postal code is a required field"),
   address_city: yup.string(),
   password: yup
     .string()
@@ -76,6 +101,7 @@ const SignUp = ({ setTab, ...props }) => {
     const registerData = {
       ...data,
       phone_code,
+      address_street_1: data.address_street_1.trim(),
       phone_number: national_number,
       confirm_password: data.confirmPassword,
     };
@@ -186,7 +212,6 @@ const SignUp = ({ setTab, ...props }) => {
               control={control}
               error={errors.address_postal_code}
               required={true}
-
             />
           </Grid>
 

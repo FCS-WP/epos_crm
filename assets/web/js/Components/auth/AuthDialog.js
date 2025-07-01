@@ -1,17 +1,24 @@
-import React, { useState } from "react";
-import eposLogo from "../../../icon/eposLogo.png";
+import React, { useState, useEffect } from "react";
+import eposLogo from "../../../icons/eposLogo.png";
 import { Dialog, DialogContent, Tabs, Tab } from "@mui/material";
 
-import { toast } from "react-toastify";
-import { webApi } from "../../api";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 
 const AuthDialog = ({ open, onClose }) => {
   const [tab, setTab] = useState(0);
+  const [siteLogo, setSiteLogo] = useState("");
+
   const handleOnClose = () => {
     onClose();
   };
+  useEffect(() => {
+    const element = document.getElementById("epos_crm_login_form");
+    if (element) {
+      const siteLogo = element.dataset.siteLogo;
+      setSiteLogo(siteLogo);
+    }
+  }, []);
 
   return (
     <Dialog
@@ -33,7 +40,11 @@ const AuthDialog = ({ open, onClose }) => {
           padding: "20px 12px",
         }}
       >
-        <img style={{ width: "150px" }} src={eposLogo} alt="EPOS Logo" />
+        <img
+          style={{ width: "150px", marginBottom: "20px" }}
+          src={siteLogo ?? eposLogo}
+          alt="EPOS Logo"
+        />
         <Tabs
           sx={{ mb: 3 }}
           value={tab}

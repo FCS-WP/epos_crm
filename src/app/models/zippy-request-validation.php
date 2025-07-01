@@ -27,9 +27,8 @@ class Zippy_Request_Validation
         foreach ($schema as $field => $rules) {
             $isRequired = $rules['required'] ?? false;
             $expectedType = $rules['data_type'] ?? 'string';
-
             // Check if required field is missing or empty
-            if ($isRequired && (!isset($request[$field]) || trim($request[$field]) === '')) {
+            if ($isRequired && (!isset($request[$field]))) {
                 $errors[$field] = ucfirst(str_replace('_', ' ', $field)) . ' is required.';
                 continue;
             }

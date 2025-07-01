@@ -69,7 +69,13 @@ class Epos_Crm_Web
 
     $site_name = get_option('blogname') ?? "EPOS";
 
-    return '<div id="epos_crm_login_form" data-site-name="' . $site_name . '"></div>';
+    $logo_id = get_theme_mod('custom_logo');
+
+    $image = wp_get_attachment_image_src($logo_id, 'full');
+
+    $logo_url = !empty($image[0]) ? $image[0] : '/wp-content/plugins/epos_crm/assets/web/icons/eposLogo.png';
+
+    return '<div id="epos_crm_login_form" data-site-name="' . $site_name . '" data-site-logo="' . $logo_url . '"></div>';
   }
 
   public function render_login_form()
