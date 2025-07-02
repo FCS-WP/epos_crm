@@ -27,24 +27,27 @@ const schema = yup.object().shape({
     .string()
     .transform((value) => {
       if (typeof value === "string") {
-        const local = value
+        const cleaned = value
           .trim()
-          .replace(/^(\+65|65)/, "")
+          .replace(/^(\+65|65)/, "") // remove +65 or 65 prefix
           .replace(/[\s-]/g, "");
 
-        if (/^[689]\d{7}$/.test(local)) {
-          return `+65 ${local}`;
+        if (/^[689]\d{7}$/.test(cleaned)) {
+          return `+65 ${cleaned}`;
         }
 
         return value.trim();
       }
       return value;
     })
-    .matches(
-      /^\+65\s[689]\d{7}$/,
-      "Phone number must be 8 digits starting with 6, 8, or 9 (e.g. +65 91234567)"
-    )
+    .test("sg-phone", "Invalid Phone number", (value) => {
+      if (typeof value === "string" && value.startsWith("+65")) {
+        return /^\+65\s[689]\d{7}$/.test(value);
+      }
+      return true;
+    })
     .required("Phone Number is a required field"),
+
   email: yup
     .string()
     .email("Invalid email")
