@@ -11,6 +11,7 @@ import PasswordField from "../common/FormFields/PasswordField";
 import Toast from "../common/notifications/toast";
 import PhoneField from "../common/FormFields/PhoneField";
 import UpdateEmail from "./UpdateEmail";
+import { isValidEmail } from "../../Helper/email-regex";
 
 const loginSchema = yup.object().shape({
   phone_number: yup.string().required("Phone Number is a required field"),
@@ -18,7 +19,7 @@ const loginSchema = yup.object().shape({
   password: yup.string().required("Password is a required field"),
 });
 
-const SignIn = ({ handleClosePopup, ...props }) => {
+const SignIn = ({ handleClosePopup, handleMissingEmail, ...props }) => {
   const [loading, setLoading] = useState(false);
   const [isMissingEmail, setIsMissingEmail] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -31,6 +32,7 @@ const SignIn = ({ handleClosePopup, ...props }) => {
   const handleBackToShop = async () => {
     window.location.href = window.location.origin;
   };
+
 
   const buildPhoneParam = (phone_number) => {
     try {
@@ -58,25 +60,27 @@ const SignIn = ({ handleClosePopup, ...props }) => {
       phone_number: national_number,
       password,
     };
-
     try {
       const { data } = await webApi.loginAccount(loginData);
 
       if (data && data?.status == "success") {
-        if (data?.data?.attributes?.email == "") {
+        const email = data?.data?.attributes?.email ?? "";
+        if (email == "" || !isValidEmail(email)) {
           Toast({
-            method: "warning",
-            subtitle: "Please update your email address to continue",
+            method: email === "" ? "warning" : "error",
+            subtitle:
+              email === ""
+                ? "Please update your email address to continue"
+                : "Invalid Email Address",
           });
-
           setIsMissingEmail(true);
           setCurrentUser(data?.data.id);
+          handleMissingEmail(true);
         } else {
           Toast({
             method: "success",
             subtitle: "Login successfully.",
           });
-
           handleClose();
           window.location.reload();
         }

@@ -20,6 +20,7 @@ import PhoneField from "../common/FormFields/PhoneField";
 import InputField from "../common/FormFields/InputField";
 import SelectCountryField from "../common/FormFields/SelectCountryField";
 import countryList from "../../Helper/countries";
+import { emailRegex } from "../../Helper/email-regex";
 
 const schema = yup.object().shape({
   full_name: yup.string().required("Full name is a required field"),
@@ -51,7 +52,7 @@ const schema = yup.object().shape({
   email: yup
     .string()
     .email("Invalid email")
-    .matches(/^[^@]+@[^@]+\.[^@]+$/, "Invalid email")
+    .matches(emailRegex, "Invalid email")
     .required("Email is a required field"),
 
   address_street_1: yup
