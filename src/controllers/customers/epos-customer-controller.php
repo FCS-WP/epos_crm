@@ -15,6 +15,7 @@ use EPOS_CRM\Src\App\Models\Zippy_Request_Validation;
 use EPOS_CRM\Src\App\Zippy_Response_Handler;
 use EPOS_CRM\Utils\Woo_Session_Handler;
 use EPOS_CRM\Src\App\Helper\Handle_Response_Errors;
+use EPOS_CRM\Utils\EPOS_Helper;
 use Exception;
 
 defined('ABSPATH') or die();
@@ -55,7 +56,9 @@ class Epos_Customer_controller
 
     if ($response['status'] == 'success') {
       $data = !empty($response['data']) ? $response['data'] : null;
-      if (!empty($data->attributes->email)) {
+      $email = !empty($data->attributes->email) ? $data->attributes->email : '';
+      $is_validEmail = EPOS_Helper::isValidEmail($email);
+      if ($is_validEmail) {
         $session = new Woo_Session_Handler;
         $session->set(self::$customer_key, $data->attributes);
         $session->set(self::$customer_id, $data->id);
@@ -331,7 +334,7 @@ class Epos_Customer_controller
       $response = Handle_Response_Errors::V5_API_Error_Internal($e, $errors);
       return $response;
     } catch (ConnectException $e) {
-     return [
+      return [
         'status' => false,
         'message' => 'Login service is currently unavailable. Please try again later.',
         'error_code' => 'service_unavailable',
