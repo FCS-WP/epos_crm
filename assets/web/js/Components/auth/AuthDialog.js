@@ -28,6 +28,7 @@ const AuthDialog = ({ open, onClose }) => {
           onClose(event);
         }
       }}
+      disableEscapeKeyDown
       maxWidth="xs"
       sx={{
         padding: "0",
