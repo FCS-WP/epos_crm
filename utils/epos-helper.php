@@ -27,4 +27,10 @@ class EPOS_Helper
       'last_name' => $last_name
     );
   }
+
+  public static function  isValidEmail($email)
+  {
+    $regex = '/^[^@]+@[^@]+\.[^@]+$/';
+    return preg_match($regex, $email) === 1;
+  }
 }

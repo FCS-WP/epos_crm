@@ -33,7 +33,6 @@ const SignIn = ({ handleClosePopup, handleMissingEmail, ...props }) => {
     window.location.href = window.location.origin;
   };
 
-
   const buildPhoneParam = (phone_number) => {
     try {
       const parsed = parsePhoneNumberFromString(phone_number);
@@ -65,13 +64,10 @@ const SignIn = ({ handleClosePopup, handleMissingEmail, ...props }) => {
 
       if (data && data?.status == "success") {
         const email = data?.data?.attributes?.email ?? "";
-        if (email == "" || !isValidEmail(email)) {
+        if (!isValidEmail(email)) {
           Toast({
-            method: email === "" ? "warning" : "error",
-            subtitle:
-              email === ""
-                ? "Please update your email address to continue"
-                : "Invalid Email Address",
+            method: "warning",
+            subtitle: "Please update your email address to continue",
           });
           setIsMissingEmail(true);
           setCurrentUser(data?.data.id);
