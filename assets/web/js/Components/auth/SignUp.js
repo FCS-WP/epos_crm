@@ -20,18 +20,53 @@ import PhoneField from "../common/FormFields/PhoneField";
 import InputField from "../common/FormFields/InputField";
 import SelectCountryField from "../common/FormFields/SelectCountryField";
 import countryList from "../../Helper/countries";
+import { emailRegex } from "../../Helper/email-regex";
 
 const schema = yup.object().shape({
   full_name: yup.string().required("Full name is a required field"),
-  phone_number: yup.string().required("Phone Number is a required field"),
+  phone_number: yup
+    .string()
+    .transform((value) => {
+      if (typeof value === "string") {
+        const cleaned = value
+          .trim()
+          .replace(/^(\+65|65)/, "") // remove +65 or 65 prefix
+          .replace(/[\s-]/g, "");
+
+        if (/^[689]\d{7}$/.test(cleaned)) {
+          return `+65 ${cleaned}`;
+        }
+
+        return value.trim();
+      }
+      return value;
+    })
+    .test("sg-phone", "Invalid Phone number", (value) => {
+      if (typeof value === "string" && value.startsWith("+65")) {
+        return /^\+65\s[689]\d{7}$/.test(value);
+      }
+      return true;
+    })
+    .required("Phone Number is a required field"),
+
   email: yup
     .string()
     .email("Invalid email")
+    .matches(emailRegex, "Invalid email")
     .required("Email is a required field"),
-  address_street_1: yup.string().required("Address is a required field"),
+
+  address_street_1: yup
+    .string()
+    .transform((value) => (typeof value === "string" ? value.trim() : value))
+    .required("Address is a required field"),
+
   address_street_2: yup.string(),
   address_country: yup.string().required("Country is a required field"),
-  address_postal_code: yup.string().required("Postal code is a required field"),
+  address_postal_code: yup
+    .number("Invalid postal code")
+    .typeError("Invalid postal code")
+    .required("Postal code is a required field"),
+
   address_city: yup.string(),
   password: yup
     .string()
@@ -76,6 +111,7 @@ const SignUp = ({ setTab, ...props }) => {
     const registerData = {
       ...data,
       phone_code,
+      address_street_1: data.address_street_1.trim(),
       phone_number: national_number,
       confirm_password: data.confirmPassword,
     };
@@ -186,7 +222,6 @@ const SignUp = ({ setTab, ...props }) => {
               control={control}
               error={errors.address_postal_code}
               required={true}
-
             />
           </Grid>
 

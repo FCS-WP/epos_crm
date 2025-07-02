@@ -10,100 +10,73 @@ namespace EPOS_CRM\Src\App\Models;
 
 defined('ABSPATH') or die();
 
-use DateTime;
 
 class Zippy_Request_Validation
 {
-    public static function validate_request($required_fields, $request)
+    /**
+     * Validates a request against a schema.
+     *
+     * @param array $schema  Field validation rules.
+     * @param array $request Incoming request data.
+     * @return array List of error messages, or empty array if valid.
+     */
+    public static function validate_request(array $schema, object $request): array
     {
-        /* Validate main required fields */
-        foreach ($required_fields as $field => $rules) {
-            if ((isset($rules['required']) && $rules['required'] == true) && (!isset($request[$field]) || $request[$field] === "")) {
-                return "$field is required";
+        $errors = [];
+
+        foreach ($schema as $field => $rules) {
+            $isRequired = $rules['required'] ?? false;
+            $expectedType = $rules['data_type'] ?? 'string';
+            // Check if required field is missing or empty
+            if ($isRequired && (!isset($request[$field]))) {
+                $errors[$field] = ucfirst(str_replace('_', ' ', $field)) . ' is required.';
+                continue;
             }
 
-            if ($rules["data_type"] == "range" && !empty($request[$field])) {
-                if (!in_array(strtolower($request[$field]), $rules['allowed_values'], true)) {
-                    return "$field must be one of: " . implode(", ", $rules['allowed_values']);
-                }
+            if (!isset($request[$field])) {
+                continue;
             }
 
+            $value = $request[$field];
 
-            // time
-            if ($rules["data_type"] == "time" && !empty($request[$field])) {
-                $datetime = DateTime::createFromFormat('H:i:s', $request[$field]);
-                if (!$datetime || $datetime->format('H:i:s') !== $request[$field]) {
-                    return "$field must be a valid time in the format H:i:s";
-                }
-            }
+            // Type checking
+            switch ($expectedType) {
+                case 'string':
+                    if (!is_string($value)) {
+                        $errors[$field] = ucfirst($field) . ' must be a string.';
+                    }
+                    break;
 
+                case 'integer':
+                    if (!filter_var($value, FILTER_VALIDATE_INT)) {
+                        $errors[$field] = ucfirst($field) . ' must be an integer.';
+                    }
+                    break;
 
-            // datetime
-            if ($rules["data_type"] == "datetime" && !empty($request[$field])) {
-                $datetime = DateTime::createFromFormat('Y-m-d H:i:s', $request[$field]);
-                if (!$datetime || $datetime->format('Y-m-d H:i:s') !== $request[$field]) {
-                    return "$field must be a valid datetime in the format Y-m-d H:i:s.";
-                }
-            }
+                case 'email':
+                    if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        $errors[$field] = ucfirst($field) . ' must be a valid email address.';
+                    }
+                    break;
 
+                case 'boolean':
+                    if (!is_bool($value) && !in_array($value, ['true', 'false', 1, 0, '1', '0'], true)) {
+                        $errors[$field] = ucfirst($field) . ' must be a boolean.';
+                    }
+                    break;
 
-            // date
-            if ($rules["data_type"] == "date" && !empty($request[$field])) {
-                $datetime = DateTime::createFromFormat('Y-m-d', $request[$field]);
-                if (!$datetime || $datetime->format('Y-m-d') !== $request[$field]) {
-                    return "$field must be a valid date in the format Y-m-d.";
-                }
-            }
+                case 'array':
+                    if (!is_array($value)) {
+                        $errors[$field] = ucfirst($field) . ' must be a list.';
+                    }
+                    break;
 
-
-            // String
-            if ($rules["data_type"] == "string" && !empty($request[$field])) {
-                if (!is_string($request[$field])) {
-                    return "$field must be string";
-                }
-            }
-
-
-            // Number
-            if ($rules["data_type"] == "number" && !empty($request[$field])) {
-                if (!is_numeric($request[$field])) {
-                    return "$field must be number";
-                }
-            }
-
-
-            // Array
-            if ($rules["data_type"] == "array" && !empty($request[$field])) {
-                if (!is_array($request[$field])) {
-                    return "$field must be array";
-                }
-            }
-
-
-            // Email
-            if ($rules["data_type"] == "email" && !empty($request[$field])) {
-                if (!is_email($request[$field])) {
-                    return "$field must be email";
-                }
-            }
-
-            // Boolean
-            if ($rules["data_type"] == "boolean" && !empty($request[$field])) {
-                if (!in_array(strtolower($request[$field]), ["t", "f"])) {
-                    return "$field must be T or F";
-                }
+                // Add more type checks as needed
+                default:
+                    $errors[$field] = 'Invalid data type rule for ' . $field . '.';
             }
         }
-    }
 
-
-    public static function get_weekdays()
-    {
-        return [0, 1, 2, 3, 4, 5, 6];
-    }
-    public static function validate_time($time)
-    {
-        $datetime = DateTime::createFromFormat('H:i:s', $time);
-        return $datetime && $datetime->format('H:i:s') == $time;
+        return $errors;
     }
 }

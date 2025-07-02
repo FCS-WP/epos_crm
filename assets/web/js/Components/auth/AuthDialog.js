@@ -1,17 +1,30 @@
-import React, { useState } from "react";
-import eposLogo from "../../../icon/eposLogo.png";
+import React, { useState, useEffect } from "react";
+import eposLogo from "../../../icons/eposLogo.png";
 import { Dialog, DialogContent, Tabs, Tab } from "@mui/material";
 
-import { toast } from "react-toastify";
-import { webApi } from "../../api";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 
 const AuthDialog = ({ open, onClose }) => {
   const [tab, setTab] = useState(0);
+  const [hideTab, setHideTab] = useState(false);
+  const [siteLogo, setSiteLogo] = useState("");
+
   const handleOnClose = () => {
     onClose();
   };
+
+  const handleHideTabTitle = (hide) => {
+    setHideTab(hide);
+  };
+
+  useEffect(() => {
+    const element = document.getElementById("epos_crm_login_form");
+    if (element) {
+      const siteLogo = element.dataset.siteLogo;
+      setSiteLogo(siteLogo);
+    }
+  }, [hideTab]);
 
   return (
     <Dialog
@@ -21,6 +34,7 @@ const AuthDialog = ({ open, onClose }) => {
           onClose(event);
         }
       }}
+      disableEscapeKeyDown
       maxWidth="xs"
       sx={{
         padding: "0",
@@ -33,33 +47,42 @@ const AuthDialog = ({ open, onClose }) => {
           padding: "20px 12px",
         }}
       >
-        <img style={{ width: "150px" }} src={eposLogo} alt="EPOS Logo" />
-        <Tabs
-          sx={{ mb: 3 }}
-          value={tab}
-          onChange={(e, newValue) => setTab(newValue)}
-          centered
-          className="epos-tab-form"
-        >
-          <Tab
-            sx={{
-              width: "50%",
-            }}
-            label="Login"
-          />
-          <Tab
-            sx={{
-              width: "50%",
-            }}
-            label="Register"
-          />
-        </Tabs>
+        <img
+          style={{ width: "150px", marginBottom: "20px" }}
+          src={siteLogo ?? eposLogo}
+          alt="EPOS Logo"
+        />
+        {!hideTab && (
+          <Tabs
+            sx={{ mb: 3 }}
+            value={tab}
+            onChange={(e, newValue) => setTab(newValue)}
+            centered
+            className="epos-tab-form"
+          >
+            <Tab
+              sx={{
+                width: "50%",
+              }}
+              label="Login"
+            />
+            <Tab
+              sx={{
+                width: "50%",
+              }}
+              label="Register"
+            />
+          </Tabs>
+        )}
         {tab === 1 ? (
           <>
             <SignUp setTab={setTab} />
           </>
         ) : (
-          <SignIn handleClosePopup={handleOnClose} />
+          <SignIn
+            handleMissingEmail={handleHideTabTitle}
+            handleClosePopup={handleOnClose}
+          />
         )}
       </DialogContent>
     </Dialog>
