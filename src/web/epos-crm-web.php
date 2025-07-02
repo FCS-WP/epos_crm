@@ -34,7 +34,9 @@ class Epos_Crm_Web
     /* Init Function */
     add_shortcode('epos_crm_login_form', array($this, 'epos_crm_login_form_callback'));
 
-    add_action('woocommerce_after_checkout_form', array($this, 'render_login_form'));
+    add_action('wp_footer', array($this, 'render_login_form'));
+
+    add_action('woocommerce_payment_complete',  array($this, 'action_payment_complete'));
 
     /* Booking Assets  */
     add_action('wp_enqueue_scripts', array($this, 'booking_assets'));
@@ -65,27 +67,40 @@ class Epos_Crm_Web
   {
     $session = new Woo_Session_Handler;
 
-    if ($session->get('epos_customer_data')) return;
+    // if ($session->get('epos_customer_data')) return;
+    $is_login = !empty($session->get('epos_customer_data')) ? 'true' : 'false';
 
     $site_name = get_option('blogname') ?? "EPOS";
 
+    $logo_url = $this->get_logo_url();
+
+    $is_checkout = is_checkout() ? 'true' : 'false';
+
+    return '<div id="epos_crm_login_form" data-login="' . $is_login . '" data-checkout="' . $is_checkout . '" data-site-name="' . $site_name . '" data-site-logo="' . $logo_url . '"></div>';
+  }
+
+  public function render_login_form()
+  {
+    if (empty(get_option('epos_crm_token_key'))) return;
+
+    echo do_shortcode('[epos_crm_login_form]');
+  }
+
+  function action_payment_complete($order_id, $order)
+  {
+    $session = new Woo_Session_Handler;
+    $session->destroy('epos_customer_data');
+    $session->destroy('epos_customer_id');
+  }
+
+  private function get_logo_url()
+  {
     $logo_id = get_theme_mod('custom_logo');
 
     $image = wp_get_attachment_image_src($logo_id, 'full');
 
     $logo_url = !empty($image[0]) ? $image[0] : '/wp-content/plugins/epos_crm/assets/web/icons/eposLogo.png';
 
-    return '<div id="epos_crm_login_form" data-site-name="' . $site_name . '" data-site-logo="' . $logo_url . '"></div>';
-  }
-
-  public function render_login_form()
-  {
-    if (!is_checkout() || empty(get_option('epos_crm_token_key'))) return;
-
-    echo do_shortcode('[epos_crm_login_form]');
-
-    $session = new Woo_Session_Handler;
-    $session->destroy('epos_customer_data');
-    $session->destroy('epos_customer_id');
+    return $logo_url;
   }
 }

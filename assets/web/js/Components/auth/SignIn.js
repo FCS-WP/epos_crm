@@ -78,7 +78,9 @@ const SignIn = ({ handleClosePopup, ...props }) => {
           });
 
           handleClose();
-          window.location.reload();
+          setTimeout(function () {
+            window.location.reload(1);
+          }, 1000);
         }
       } else {
         Toast({
