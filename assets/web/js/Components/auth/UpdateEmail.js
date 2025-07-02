@@ -6,12 +6,13 @@ import { webApi } from "../../api";
 import { Button, Box, Typography, Grid } from "@mui/material";
 import InputField from "../common/FormFields/InputField";
 import Toast from "../common/notifications/toast";
+import { emailRegex } from "../../Helper/email-regex";
 
 const schema = yup.object().shape({
   email: yup
     .string()
     .email("Invalid email")
-    .matches(/^[^@]+@[^@]+\.[^@]+$/, "Invalid email")
+    .matches(emailRegex, "Invalid email")
     .required("Email is a required field"),
 });
 const UpdateEmail = ({ currentUser, handleClosePopup, ...props }) => {

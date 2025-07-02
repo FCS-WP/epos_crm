@@ -7,18 +7,24 @@ import SignUp from "./SignUp";
 
 const AuthDialog = ({ open, onClose }) => {
   const [tab, setTab] = useState(0);
+  const [hideTab, setHideTab] = useState(false);
   const [siteLogo, setSiteLogo] = useState("");
 
   const handleOnClose = () => {
     onClose();
   };
+
+  const handleHideTabTitle = (hide) => {
+    setHideTab(hide);
+  };
+
   useEffect(() => {
     const element = document.getElementById("epos_crm_login_form");
     if (element) {
       const siteLogo = element.dataset.siteLogo;
       setSiteLogo(siteLogo);
     }
-  }, []);
+  }, [hideTab]);
 
   return (
     <Dialog
@@ -28,6 +34,7 @@ const AuthDialog = ({ open, onClose }) => {
           onClose(event);
         }
       }}
+      disableEscapeKeyDown
       maxWidth="xs"
       sx={{
         padding: "0",
@@ -45,32 +52,37 @@ const AuthDialog = ({ open, onClose }) => {
           src={siteLogo ?? eposLogo}
           alt="EPOS Logo"
         />
-        <Tabs
-          sx={{ mb: 3 }}
-          value={tab}
-          onChange={(e, newValue) => setTab(newValue)}
-          centered
-          className="epos-tab-form"
-        >
-          <Tab
-            sx={{
-              width: "50%",
-            }}
-            label="Login"
-          />
-          <Tab
-            sx={{
-              width: "50%",
-            }}
-            label="Register"
-          />
-        </Tabs>
+        {!hideTab && (
+          <Tabs
+            sx={{ mb: 3 }}
+            value={tab}
+            onChange={(e, newValue) => setTab(newValue)}
+            centered
+            className="epos-tab-form"
+          >
+            <Tab
+              sx={{
+                width: "50%",
+              }}
+              label="Login"
+            />
+            <Tab
+              sx={{
+                width: "50%",
+              }}
+              label="Register"
+            />
+          </Tabs>
+        )}
         {tab === 1 ? (
           <>
             <SignUp setTab={setTab} />
           </>
         ) : (
-          <SignIn handleClosePopup={handleOnClose} />
+          <SignIn
+            handleMissingEmail={handleHideTabTitle}
+            handleClosePopup={handleOnClose}
+          />
         )}
       </DialogContent>
     </Dialog>
