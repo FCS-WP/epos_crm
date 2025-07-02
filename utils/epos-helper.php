@@ -33,4 +33,11 @@ class EPOS_Helper
     $regex = '/^[^@]+@[^@]+\.[^@]+$/';
     return preg_match($regex, $email) === 1;
   }
+
+  public static function  get_epos_customer_name($name)
+  {
+    $name = self::split_full_name($name);
+
+    return $name['first_name'] .  $$name['last_name'];
+  }
 }

@@ -4,16 +4,22 @@ import theme from "../theme/customTheme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import LoginForm from "./Components/LoginForm";
+import LoginIcon from "./Components/LoginIcon";
 
 document.addEventListener("DOMContentLoaded", function () {
   const zippyMain = document.getElementById("epos_crm_login_form");
-  const checkout = zippyMain.dataset.checkout === "true";
   const epos_login_icon = document.getElementById("epos_crm_login");
-  const isLogin = zippyMain.dataset.login === "true";
-  const root = ReactDOM.createRoot(zippyMain);
+  const epos_crm_user_name = document.getElementById("epos_crm_user_name");
 
-  if (checkout && typeof zippyMain != "undefined" && zippyMain != null) {
-    root.render(
+  const checkout = zippyMain?.dataset?.checkout === "true";
+  const isLogin = zippyMain?.dataset?.login === "true";
+  const username = epos_crm_user_name?.dataset?.customerName || "";
+
+  const formRoot = ReactDOM.createRoot(zippyMain);
+
+  // Mount main login form in checkout
+  if (checkout && zippyMain) {
+    formRoot.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <LoginForm isOpen={!isLogin} />
@@ -22,9 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  if (typeof epos_login_icon != "undefined" && epos_login_icon != null) {
+  // Icon click should show modal if not logged in
+  if (epos_login_icon && username === "") {
     epos_login_icon.addEventListener("click", function (e) {
-      root.render(
+      formRoot.render(
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <LoginForm isOpen={true} />

@@ -107,9 +107,6 @@ class Epos_Crm_Woocommerce
 
   public function prefill_checkout_fields($value, $input)
   {
-    if (!is_checkout()) {
-      return $value;
-    }
 
     $session = new Woo_Session_Handler;
 
@@ -122,27 +119,27 @@ class Epos_Crm_Woocommerce
 
     switch ($input) {
       case 'billing_first_name':
-        return EPOS_Helper::split_full_name($session_user_data->full_name)['first_name']  ?? $value;
+        return EPOS_Helper::split_full_name($session_user_data->full_name)['first_name']  ?? '';
       case 'billing_last_name':
-        return  EPOS_Helper::split_full_name($session_user_data->full_name)['last_name'] ?? $value;
+        return  EPOS_Helper::split_full_name($session_user_data->full_name)['last_name'] ?? '';
       case 'billing_email':
-        return $session_user_data->email ?? $value;
+        return $session_user_data->email ?? '';
       case 'epos_customer_id':
-        return $session_user_id ?? $value;
+        return $session_user_id ?? '';
       case 'billing_phone':
-        return $session_user_data->phone_number ?? $value;
+        return $session_user_data->phone_number ?? '';
       case 'billing_address_1':
-        return $session_user_data->address_street_1 ?? $value;
+        return $session_user_data->address_street_1 ?? '';
       case 'billing_address_2':
-        return $session_user_data->address_street_2 ?? $value;
+        return $session_user_data->address_street_2 ?? '';
       case 'billing_postcode':
-        return $session_user_data->address_postal_code ?? $value;
+        return $session_user_data->address_postal_code ?? '';
       case 'billing_city':
-        return $session_user_data->address_city ?? $value;
+        return $session_user_data->address_city ?? '';
       case 'billing_country':
-        return $session_user_data->address_country ?? $value;
+        return $session_user_data->address_country ?? '';
       default:
-        return $value;
+        return '';
     }
   }
 }
