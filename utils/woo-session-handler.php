@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Woocommerce Session Handler
+ * WooCommerce Session Handler
  *
  * @package Shin
  */
@@ -14,27 +14,33 @@ use WC_Session_Handler;
 
 class Woo_Session_Handler
 {
-  public function __construct()
+
+
+  /**
+   * Initialize WooCommerce session.
+   */
+  public function init_session()
   {
-    if (!WC()->session) {
-      WC()->session = new WC_Session_Handler();
-      WC()->session->init();
-    }
+    // if (!WC()->session) {
+    WC()->session = new WC_Session_Handler();
+    WC()->session->init();
+    // var_dump(WC()->session);
+    // }
   }
 
   /**
-   * Set session data
+   * Set session data.
    *
    * @param string $key
    * @param mixed $value
    */
   public function set($key, $value)
   {
-    WC()->session->set($key, $value);
+    WC()->session->__set($key, $value);
   }
 
   /**
-   * Get session data
+   * Get session data.
    *
    * @param string $key
    * @param mixed $default Optional default value if not found.
@@ -42,17 +48,31 @@ class Woo_Session_Handler
    */
   public function get($key, $default = null)
   {
-    $value = WC()->session->get($key);
+    $value = WC()->session->__get($key);
     return $value !== null ? $value : $default;
   }
 
   /**
-   * Destroy a session key
+   * Delete a specific session key.
    *
    * @param string $key
    */
   public function destroy($key)
   {
-    WC()->session->__unset($key);
+    if (WC()->session) {
+      WC()->session->__unset($key);
+    }
+  }
+
+  /**
+   * Delete the entire customer session from cache and DB.
+   */
+  public function delete_session()
+  {
+    if (WC()->session) {
+      // var_dump($this->_customer_id);
+      WC()->session->__unset('epos_customer_data');
+      WC()->session->__unset('epos_customer_id');
+    }
   }
 }

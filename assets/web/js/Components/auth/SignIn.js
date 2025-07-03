@@ -78,7 +78,9 @@ const SignIn = ({ handleClosePopup, handleMissingEmail, ...props }) => {
             subtitle: "Login successfully.",
           });
           handleClose();
-          window.location.reload();
+          setTimeout(function () {
+            window.location.reload(1);
+          }, 1000);
         }
       } else {
         Toast({

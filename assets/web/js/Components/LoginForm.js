@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import AuthDialog from "./auth/AuthDialog";
 
-const LoginForm = () => {
-  const [open, setOpen] = useState(true);
+const LoginForm = ({ isOpen }) => {
+  const [open, setOpen] = useState(isOpen);
   return (
     <>
-      <AuthDialog
-        open={open}
-        onClose={() => setOpen(false)}
-      />
+      <AuthDialog open={open} onClose={() => setOpen(false)} />
     </>
   );
 };

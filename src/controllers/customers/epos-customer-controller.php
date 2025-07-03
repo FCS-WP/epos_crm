@@ -60,6 +60,7 @@ class Epos_Customer_controller
       $is_validEmail = EPOS_Helper::isValidEmail($email);
       if ($is_validEmail) {
         $session = new Woo_Session_Handler;
+        $session->init_session();
         $session->set(self::$customer_key, $data->attributes);
         $session->set(self::$customer_id, $data->id);
       }
@@ -77,6 +78,7 @@ class Epos_Customer_controller
       $data = !empty($response['data']) ? $response['data'] : null;
       if (!empty($data)) {
         $session = new Woo_Session_Handler;
+        $session->init_session();
         $session->set(self::$customer_key, $data);
         $session->set(self::$customer_id, $data->id);
       }
@@ -197,6 +199,23 @@ class Epos_Customer_controller
       return [
         'status' => 'error',
         'message' => 'An unexpected error occurred during registration.',
+        'error_code' => 'internal_error',
+      ];
+    }
+  }
+
+  // Logout Controller
+
+  public static function logout($request)
+  {
+    try {
+      $session = new Woo_Session_Handler;
+      $session->destroy('epos_customer_data');
+      $session->destroy('epos_customer_id');
+    } catch (\Throwable $th) {
+      return [
+        'status' => 'error',
+        'message' => 'An unexpected error occurred during logout.',
         'error_code' => 'internal_error',
       ];
     }

@@ -90,3 +90,10 @@ p.MuiFormHelperText-root {
     color: #000 !important;
   }
 }
+
+#epos_crm_user_name {
+  & svg {
+    width: 30px;
+    height: 30px;
+  }
+}
