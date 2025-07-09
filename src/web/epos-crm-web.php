@@ -38,6 +38,8 @@ class Epos_Crm_Web
 
     add_action('wp_footer', array($this, 'render_login_form'));
 
+    add_action('woocommerce_before_checkout_form', array($this, 'render_point_information'));
+
     add_action('woocommerce_thankyou',  array($this, 'action_payment_complete'));
 
     /* Booking Assets  */
@@ -91,6 +93,11 @@ class Epos_Crm_Web
     if (empty(get_option('epos_crm_token_key')) || is_wc_endpoint_url('order-received')) return;
 
     echo do_shortcode('[epos_crm_login_form]');
+  }
+
+  public function render_point_information()
+  {
+    echo '<div id="epos_crm_point_information"></div>';
   }
 
   public function action_payment_complete($order_id)
