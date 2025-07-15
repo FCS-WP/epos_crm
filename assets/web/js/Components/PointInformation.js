@@ -2,7 +2,6 @@ import React from "react";
 import GroupIcon from "@mui/icons-material/Group";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
 
-
 const PointInformation = ({
   isOpen,
   membershipTier = "Silver",
@@ -38,13 +37,10 @@ const PointInformation = ({
       <div className="point-info__group">
         <input
           type="text"
-          class="input-text "
+          className="input-text "
           name="epos_crm_billing_point"
           id="epos_crm_billing_point"
           placeholder="First Name"
-          value="Shin"
-          aria-required="true"
-          autocomplete="given-name"
         ></input>
       </div>
     </section>
