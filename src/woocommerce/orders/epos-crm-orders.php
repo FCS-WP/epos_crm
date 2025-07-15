@@ -50,12 +50,40 @@ class Epos_Crm_Orders
     if (! empty($epos_customer_id) && !empty($order_id)) {
       $order = new WC_Order($order_id);
 
-      $order->update_meta_data('epos_customer_id', $epos_customer_id, true);
+      $meta_data = $this->build_order_meta_data($epos_customer_id);
 
-      $order->update_meta_data('use_billing_info', $this->handle_get_ship_to_destination(), true); // shipping, billing, billing_only
+      $order->update_meta_data('epos_crm', $meta_data, true);
 
       $order->save_meta_data();
     }
+  }
+  private function build_order_meta_data($epos_customer_id)
+  {
+
+    $meta_data = array(
+      "order_id" => com_create_guid(),
+      "customer_id" => $epos_customer_id,
+      "use_billing_info" => $this->handle_get_ship_to_destination(),
+      "payments" => array(
+        array(
+          "id" => com_create_guid(),
+          "strategy" => "point_consumption",
+          "points_used" => "100",
+          "conversion_rate" => "1",
+          "value" => "100",
+          "transacted_at" => "2020-03-11T19:56:05",
+          "redemption_id" => com_create_guid()
+        ),
+        array(
+          "id" => com_create_guid(),
+          "strategy" => "cash",
+          "value" => "500",
+          "transacted_at" => "2020-03-11T19:56:05"
+        )
+      )
+    );
+
+    return json_encode($meta_data);
   }
 
   private function handle_get_ship_to_destination()

@@ -12,6 +12,7 @@ defined('ABSPATH') or die();
 
 use EPOS_CRM\Src\Routers\General\General_Routers;
 use EPOS_CRM\Src\Routers\Customers\Customer_Routers;
+use EPOS_CRM\Src\Routers\Orders\Orders_Routers;
 
 
 class Epos_Crm_Routers
@@ -34,5 +35,6 @@ class Epos_Crm_Routers
   {
     General_Routers::get_instance();
     Customer_Routers::get_instance();
+    Orders_Routers::get_instance();
   }
 }

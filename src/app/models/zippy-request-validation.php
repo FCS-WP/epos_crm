@@ -52,6 +52,11 @@ class Zippy_Request_Validation
                         $errors[$field] = ucfirst($field) . ' must be an integer.';
                     }
                     break;
+                case 'float':
+                    if (!filter_var($value, FILTER_VALIDATE_FLOAT)) {
+                        $errors[$field] = ucfirst($field) . ' must be an float.';
+                    }
+                    break;
 
                 case 'email':
                     if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
