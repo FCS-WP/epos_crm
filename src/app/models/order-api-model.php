@@ -19,7 +19,7 @@ class Order_Api_Model
   public static function redeem_args()
   {
     return array(
-      'redeem_point' => array(
+      'point_use' => array(
         'required' => true,
         'validate_callback' => function ($param, $request, $key) {
           return is_numeric($param);

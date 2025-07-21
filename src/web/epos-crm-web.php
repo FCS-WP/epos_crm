@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Bookings FontEnd Form
+ * Epos_crm_webs FontEnd Form
  *
  *
  */
@@ -42,8 +42,8 @@ class Epos_Crm_Web
 
     add_action('woocommerce_thankyou',  array($this, 'action_payment_complete'));
 
-    /* Booking Assets  */
-    add_action('wp_enqueue_scripts', array($this, 'booking_assets'));
+    /* Epos_crm_web Assets  */
+    add_action('wp_enqueue_scripts', array($this, 'epos_crm_web_assets'));
   }
 
   public function function_init()
@@ -51,15 +51,15 @@ class Epos_Crm_Web
     return;
   }
 
-  public function booking_assets()
+  public function epos_crm_web_assets()
   {
     $version = time();
 
     $current_user_id = get_current_user_id();
     $user_info = get_userdata($current_user_id);
     // Form Assets
-    wp_enqueue_script('booking-js', EPOS_CRM_URL . '/assets/dist/js/web.min.js', [], $version, true);
-    wp_enqueue_style('booking-css', EPOS_CRM_URL . '/assets/dist/css/web.min.css', [], $version);
+    wp_enqueue_script('epos_crm_web-js', EPOS_CRM_URL . '/assets/dist/js/web.min.js', [], $version, true);
+    wp_enqueue_style('epos_crm_web-css', EPOS_CRM_URL . '/assets/dist/css/web.min.css', [], $version);
   }
 
   public function epos_crm_login_form_callback($atts)
@@ -97,7 +97,17 @@ class Epos_Crm_Web
 
   public function render_point_information()
   {
-    echo '<div id="epos_crm_point_information"></div>';
+    $session = new Woo_Session_Handler;
+
+    $customer_data = $session->get('epos_customer_data');
+    if (empty($customer_data->active_member)) return;
+
+    echo '<div id="epos_crm_point_information"
+      data-active-member="' . $customer_data->active_member . '"
+      data-points="' . $customer_data->point_balance . '"
+      data-point-rate="' . $customer_data->point_conversion_rate . '"
+      >
+      </div>';
   }
 
   public function action_payment_complete($order_id)

@@ -46,11 +46,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (epos_crm_point_information) {
     const pointInfoRoot = ReactDOM.createRoot(epos_crm_point_information);
-
+    const points = epos_crm_point_information?.dataset?.points;
+    const pointRate = epos_crm_point_information?.dataset?.pointRate;
     pointInfoRoot.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <PointInformation isOpen={true} />
+        <PointInformation isOpen={true} points={points} pointRate={pointRate} />
         <ToastContainer />
       </ThemeProvider>
     );

@@ -17,11 +17,48 @@ input#epos_customer_id {
     }
   }
 }
+#epos_crm_point_information {
+  .epos_crm_point_input {
+    border: 1px solid #333 !important;
+    max-height: 45px;
+
+    input {
+      width: 100%;
+    }
+
+    &.Mui-focused {
+      border: 1px solid #bfd3ff !important;
+    }
+
+    background: transparent !important;
+    #epos_crm_billing_point {
+      background: transparent !important;
+    }
+  }
+  .group_input {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    .input-point {
+      @include tablet {
+        width: 400px;
+      }
+    }
+    .point-redeem-button {
+      width: 150px;
+
+      max-height: 45px;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      box-shadow: none !important;
+    }
+  }
+}
 
 .point-info {
   &__container {
     margin: 1rem 0;
-    padding: 1rem;
   }
 
   &__title {

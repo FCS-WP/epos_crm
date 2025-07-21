@@ -40,7 +40,7 @@ class Orders_Routers
 
   public function order_init_api()
   {
-    register_rest_route(EPOS_CRM_API_NAMESPACE, '/epos-redeem', array(
+    register_rest_route(EPOS_CRM_API_NAMESPACE, '/customers/redeem', array(
       'methods' => 'POST',
       'callback' => [Epos_Orders_Controller::class, 'epos_redeem'],
       'args' => Order_Api_Model::redeem_args(),

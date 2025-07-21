@@ -60,9 +60,9 @@ if (!defined('EPOS_CRM_API_NAMESPACE')) {
  | Autoload & Includes
  ------------------------------------------------*/
 // Prevent autoload conflicts with other Composer plugins
-if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
-  // require_once EPOS_CRM_DIR_PATH . 'vendor/autoload.php';
-}
+// if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
+//   require_once EPOS_CRM_DIR_PATH . 'vendor/autoload.php';
+// }
 
 require_once EPOS_CRM_DIR_PATH . 'includes/autoload.php';
 require_once EPOS_CRM_DIR_PATH . 'includes/constances.php';
