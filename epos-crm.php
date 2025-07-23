@@ -52,17 +52,17 @@ if (!defined('EPOS_CRM_API_NAMESPACE')) {
   define('EPOS_CRM_API_NAMESPACE', 'epos-crm/v1');
 }
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 /*-----------------------------------------------
  | Autoload & Includes
  ------------------------------------------------*/
 // Prevent autoload conflicts with other Composer plugins
-if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
-  // require_once EPOS_CRM_DIR_PATH . 'vendor/autoload.php';
-}
+// if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
+//   require_once EPOS_CRM_DIR_PATH . 'vendor/autoload.php';
+// }
 
 require_once EPOS_CRM_DIR_PATH . 'includes/autoload.php';
 require_once EPOS_CRM_DIR_PATH . 'includes/constances.php';
@@ -83,3 +83,5 @@ add_action('plugins_loaded', function () {
   Epos_Crm_Web::get_instance();
   Epos_Crm_Woocommerce::get_instance();
 });
+
+

@@ -28,6 +28,7 @@ class Epos_Customer_controller
   private static $client;
   private static $customer_key = 'epos_customer_data';
   private static $customer_id = 'epos_customer_id';
+  private static $epos_customer_token = 'epos_customer_token';
 
   private static function init_client_internal()
   {
@@ -43,7 +44,7 @@ class Epos_Customer_controller
   {
     if (self::$client === null) {
       self::$client = new Client([
-        'base_uri' => 'https://livedevs.com',
+        'base_uri' => EPOS_CRM_URL_SERVICE,
         'timeout'  => 10,
       ]);
     }
@@ -56,13 +57,16 @@ class Epos_Customer_controller
 
     if ($response['status'] == 'success') {
       $data = !empty($response['data']) ? $response['data'] : null;
+      $rawToken = !empty($response['authorization']) ? $response['authorization'] : null;
       $email = !empty($data->attributes->email) ? $data->attributes->email : '';
       $is_validEmail = EPOS_Helper::isValidEmail($email);
+      $epos_customer_token = self::getTokenAutoLogin($rawToken);
       if ($is_validEmail) {
         $session = new Woo_Session_Handler;
         $session->init_session();
         $session->set(self::$customer_key, $data->attributes);
         $session->set(self::$customer_id, $data->id);
+        $session->set(self::$epos_customer_token, $epos_customer_token);
       }
     }
 
@@ -341,11 +345,15 @@ class Epos_Customer_controller
 
       $login = self::$client->post("api/modules/woocommerce/customers/login", $options);
 
+      // var_dump($login);
+
       $response = array(
         'status' => 'success',
         'message' => 'Login successfully',
-        'data' => json_decode($login->getBody())->data
+        'data' => json_decode($login->getBody())->data,
+        'authorization' => $login->getHeaders()['Authorization']
       );
+
       return $response;
     } catch (ClientException $e) {
       $responseBody = $e->getResponse()->getBody()->getContents();
@@ -365,5 +373,14 @@ class Epos_Customer_controller
         'error_code' => 'internal_error',
       ];
     }
+  }
+
+  private static function getTokenAutoLogin($rawToken)
+  {
+
+
+    if (empty($rawToken)) return null;
+
+    return array_shift(array_values(str_replace('Bearer ', '', $rawToken)));;
   }
 }

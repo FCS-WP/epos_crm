@@ -15,4 +15,8 @@ export const webApi = {
   async registerAccount(params) {
     return await makeRequest("/customers/register", params, "POST");
   },
+
+   async pointRedeem(params) {
+    return await makeRequest("/customers/redeem", params, "POST");
+  },
 };

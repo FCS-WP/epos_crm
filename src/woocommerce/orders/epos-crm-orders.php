@@ -11,6 +11,8 @@ namespace EPOS_CRM\Src\Woocommerce\Orders;
 defined('ABSPATH') or die();
 
 use WC_Order;
+use EPOS_CRM\Utils\Utils_Core;
+use EPOS_CRM\Src\Woocommerce\Orders\Epos_Crm_Orders_Payload;
 
 class Epos_Crm_Orders
 {
@@ -47,21 +49,16 @@ class Epos_Crm_Orders
   public function add_order_meta_data($order_id)
   {
     $epos_customer_id = $_POST['epos_customer_id'];
+
     if (! empty($epos_customer_id) && !empty($order_id)) {
+
       $order = new WC_Order($order_id);
 
-      $order->update_meta_data('epos_customer_id', $epos_customer_id, true);
+      $meta_data = Epos_Crm_Orders_Payload::build_order_meta_data($epos_customer_id, $order);
 
-      $order->update_meta_data('use_billing_info', $this->handle_get_ship_to_destination(), true); // shipping, billing, billing_only
+      $order->update_meta_data('epos_crm', $meta_data, true);
 
       $order->save_meta_data();
     }
-  }
-
-  private function handle_get_ship_to_destination()
-  {
-    if (get_option('woocommerce_ship_to_destination') == 'shipping') return 'false';
-
-    return 'true';
   }
 }

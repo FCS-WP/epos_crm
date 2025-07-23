@@ -14,6 +14,7 @@ use EPOS_CRM\Utils\EPOS_Helper;
 
 use EPOS_CRM\Utils\Woo_Session_Handler;
 use EPOS_CRM\Src\Woocommerce\Orders\Epos_Crm_Orders;
+use EPOS_CRM\Src\Woocommerce\Checkout\Epos_Crm_Checkout_Process;
 
 class Epos_Crm_Woocommerce
 {
@@ -42,11 +43,16 @@ class Epos_Crm_Woocommerce
     $this->set_hooks();
 
     Epos_Crm_Orders::get_instance();
+
     /* Update Checkout After Applied Coupon */
     add_action('trigger_update_checkout', array($this, 'trigger_update_checkout_callback'), 1, 3);
-    // EPOS Prefill Customer Infor
+
+    /* EPOS Prefill Customer Infor */
     add_action('woocommerce_checkout_get_value', array($this, 'prefill_checkout_fields'), 10, 2);
     add_filter('woocommerce_checkout_fields', array($this, 'custom_override_checkout_fields'));
+
+    /* Init handle Process checkout */
+    Epos_Crm_Checkout_Process::get_instance();
   }
 
   protected function set_hooks()

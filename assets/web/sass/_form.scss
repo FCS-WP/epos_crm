@@ -37,6 +37,9 @@
 }
 
 .epos-crm-form {
+  .MuiInputBase-root {
+    border-radius: $radius !important;
+  }
   button.MuiButtonBase-root {
     background-color: $primary;
     padding-top: 12px !important;

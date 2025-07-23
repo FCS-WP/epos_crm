@@ -1,6 +1,5 @@
 .MuiInputBase-root {
   border: 5px solid transparent !important;
-  border-radius: $radius !important;
   &.Mui-focused {
     border: 5px solid $lighterBoder2 !important;
   }
@@ -96,4 +95,15 @@ p.MuiFormHelperText-root {
     width: 30px;
     height: 30px;
   }
+}
+
+// Button Auto Login
+
+.epos-btn__auto_login {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  border-radius: $radius !important;
+  max-height: 45px;
+  margin-bottom: 24px !important;
 }

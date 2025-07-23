@@ -1,4 +1,94 @@
-input#epos_customer_id{
+input#epos_customer_id {
   display: none;
   visibility: hidden;
+}
+
+#billing_point_field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  .member-tier {
+    &__wrapper {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+}
+#epos_crm_point_information {
+  .epos_crm_point_input {
+    border: 1px solid #333 !important;
+    max-height: 45px;
+    input {
+      width: 100%;
+    }
+    &.Mui-error {
+      border: 1px solid $error !important;
+    }
+
+    &.Mui-focused {
+      border: 1px solid #bfd3ff !important;
+    }
+
+    background: transparent !important;
+    #epos_crm_billing_point {
+      background: transparent !important;
+    }
+  }
+  .group_input {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    .input-point {
+      @include tablet {
+        width: 400px;
+      }
+    }
+    .point-redeem-button {
+      // width: 220px;
+
+      max-height: 45px;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      box-shadow: none !important;
+    }
+  }
+}
+
+.point-info {
+  &__container {
+    margin: 1rem 0;
+  }
+
+  &__title {
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  &__group {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+
+    .point-info__icon {
+      margin-right: 0.75rem;
+    }
+
+    .point-info__detail {
+      label {
+        margin-bottom: 0.25rem;
+      }
+
+      .point-info__value {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.woocommerce .shop_table.woocommerce-checkout-review-order-table tr.fee td {
+  text-align: right;
 }

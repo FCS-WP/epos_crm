@@ -24,6 +24,8 @@ class Woo_Session_Handler
     // if (!WC()->session) {
     WC()->session = new WC_Session_Handler();
     WC()->session->init();
+    WC()->session->set_customer_session_cookie(true);
+
     // var_dump(WC()->session);
     // }
   }
@@ -73,6 +75,8 @@ class Woo_Session_Handler
       // var_dump($this->_customer_id);
       WC()->session->__unset('epos_customer_data');
       WC()->session->__unset('epos_customer_id');
+      WC()->session->__unset('is_used_redeem');
+      WC()->session->__unset('point_used');
     }
   }
 }
