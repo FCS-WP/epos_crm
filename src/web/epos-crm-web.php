@@ -11,6 +11,8 @@ namespace EPOS_CRM\Src\Web;
 defined('ABSPATH') or die();
 
 use EPOS_CRM\Utils\Woo_Session_Handler;
+use EPOS_CRM\Utils\EPOS_CRM_Cart_Handler;
+use EPOS_CRM\Utils\Utils_Core;
 
 class Epos_Crm_Web
 {
@@ -34,7 +36,7 @@ class Epos_Crm_Web
     /* Init Function */
     add_shortcode('epos_crm_login_form', array($this, 'epos_crm_login_form_callback'));
 
-    add_shortcode('epos_crm_login', array($this, 'epos_crm_login_callback'));
+    add_shortcode('epos_crm_login', array($this, 'epos_crm_login_icon_callback'));
 
     add_action('wp_footer', array($this, 'render_login_form'));
 
@@ -42,14 +44,13 @@ class Epos_Crm_Web
 
     add_action('woocommerce_thankyou',  array($this, 'action_payment_complete'));
 
+    add_action('woocommerce_after_order_details',  array($this, 'dislay_button_auto_login'));
+
+
     /* Epos_crm_web Assets  */
     add_action('wp_enqueue_scripts', array($this, 'epos_crm_web_assets'));
   }
 
-  public function function_init()
-  {
-    return;
-  }
 
   public function epos_crm_web_assets()
   {
@@ -74,10 +75,10 @@ class Epos_Crm_Web
 
     $is_checkout = is_checkout() ? 'true' : 'false';
 
-    return '<div id="epos_crm_login_form" data-login="' . $is_login . '" data-checkout="' . $is_checkout . '" data-site-name="' . $site_name . '" data-site-logo="' . $logo_url . '"></div>';
+    echo Utils_Core::get_template('form-login.php', ['is_login' => $is_login, 'site_name' => $site_name, 'logo_url' => $logo_url, 'is_checkout' => $is_checkout], dirname(__FILE__), '/templates');
   }
 
-  public function epos_crm_login_callback($atts)
+  public function epos_crm_login_icon_callback($atts)
   {
     $session = new Woo_Session_Handler;
 
@@ -85,7 +86,7 @@ class Epos_Crm_Web
 
     $name = $session_user_data->full_name ?? '';
 
-    return '<div id="epos_crm_user_name" data-customer-name="' . $name . '"><span>' . $name . '</span></div>';
+    echo Utils_Core::get_template('login-icon.php', ['name' => $name], dirname(__FILE__), '/templates');
   }
 
   public function render_login_form()
@@ -99,21 +100,41 @@ class Epos_Crm_Web
   {
     $session = new Woo_Session_Handler;
 
+    $cart  =  new EPOS_CRM_Cart_Handler;
+
+    $total = $cart->get_cart_total();
+
     $customer_data = $session->get('epos_customer_data');
     if (empty($customer_data->active_member)) return;
 
-    echo '<div id="epos_crm_point_information"
-      data-active-member="' . $customer_data->active_member . '"
-      data-points="' . $customer_data->point_balance . '"
-      data-point-rate="' . $customer_data->point_conversion_rate . '"
-      >
-      </div>';
+    echo Utils_Core::get_template('point-infomation.php', ['customer_data' => $customer_data, 'total' => $total], dirname(__FILE__), '/templates');
   }
 
   public function action_payment_complete($order_id)
   {
     $session = new Woo_Session_Handler;
-    $session->delete_session();
+
+    $session->destroy('is_used_redeem');
+    $session->destroy('point_used');
+  }
+
+  public function dislay_button_auto_login()
+  {
+    $session = new Woo_Session_Handler;
+
+    $token = $session->get('epos_customer_token');
+
+    $tanent_domain =  get_option('epos_be_url', null);
+
+    if (empty($token) || empty($tanent_domain)) return;
+
+    $query_string = EPOS_CRM_CUSTOMER_PORTAL_URL . '/api/auto-login?';
+
+    $tenant_name = Utils_Core::get_subdomain($tanent_domain);
+
+    $customer_portal_url = $query_string . build_query(array('token' => $token, 'tenant' => $tenant_name));
+
+    echo Utils_Core::get_template('button-auto-login.php', ['customer_portal_url' => $customer_portal_url], dirname(__FILE__), '/templates');
   }
 
   private function get_logo_url()

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -6,24 +6,43 @@ import GroupIcon from "@mui/icons-material/Group";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
 import { Button, CircularProgress } from "@mui/material";
 import PointField from "./common/FormFields/PointField";
+import Toast from "./common/notifications/toast";
 import { webApi } from "../api";
-
-const pointSchema = yup.object().shape({
-  point: yup
-    .number()
-    .typeError("Point must be a number")
-    .min(1, "You must redeem at least 1 point")
-    .required("Please enter a point value"),
-});
 
 const PointInformation = ({
   isOpen,
   membershipTier = "Silver",
-  points = 100,
-  pointRate = 100,
+  points = 0,
+  pointRate = 0,
+  cartTotal = 0,
 }) => {
   if (!isOpen) return null;
 
+  const [point, setPoint] = useState(0);
+
+  const pointSchema = yup.object().shape({
+    point: yup
+      .number()
+      .typeError("Point must be a number")
+      .min(1, "You must redeem at least 1 point")
+      .test("max-points-tiered", "", function (value) {
+        const { createError } = this;
+
+        if (value > cartTotal) {
+          return createError({
+            message: "You've entered more points value than your order total",
+          });
+        }
+
+        if (value > points) {
+          return createError({
+            message:
+              "You've entered more points than the points you currently can redeem",
+          });
+        }
+        return true;
+      }),
+  });
   const [loading, setLoading] = useState(false);
 
   const {
@@ -40,15 +59,21 @@ const PointInformation = ({
     },
   });
 
-  const convertPoint = (point, rate) => {
-    return (point * rate) / 100;
+  const convertPoint = (points, rate) => {
+    return points * rate;
   };
 
   const onSubmit = async (data) => {
     if (loading) return;
+
     setLoading(true);
+
+    const pointData = {
+      is_used: true,
+      point_used: data.point,
+    };
     try {
-      const { data } = await webApi.pointRedeem();
+      const { data } = await webApi.pointRedeem(pointData);
 
       if (data && data?.status == "success") {
         Toast({
@@ -56,11 +81,12 @@ const PointInformation = ({
           subtitle: "successfully.",
         });
 
-        reset();
-        handleClosePopup();
-        window.location.reload();
+        // reset();
+
+        const updateEvent = new Event("update_checkout", { bubbles: true });
+        document.body.dispatchEvent(updateEvent);
       } else {
-        const errorMessage = data?.errors || "Failed to update email";
+        const errorMessage = data?.errors || "Failed to redeem point";
         Toast({
           method: "error",
           subtitle: errorMessage,
@@ -77,6 +103,11 @@ const PointInformation = ({
   };
 
   const enteredPoint = watch("point");
+
+  useEffect(() => {
+    const point = convertPoint(points, pointRate);
+    setPoint(point);
+  }, [points]);
 
   return (
     <form
@@ -130,7 +161,7 @@ const PointInformation = ({
           className="point-redeem-button"
           startIcon={loading && <CircularProgress size={16} />}
         >
-          {loading ? "Applying..." : "Apply"}
+          {loading ? "Applying..." : "Redeem Points"}
         </Button>
       </div>
     </form>

@@ -21,9 +21,11 @@ input#epos_customer_id {
   .epos_crm_point_input {
     border: 1px solid #333 !important;
     max-height: 45px;
-
     input {
       width: 100%;
+    }
+    &.Mui-error {
+      border: 1px solid $error !important;
     }
 
     &.Mui-focused {
@@ -45,7 +47,7 @@ input#epos_customer_id {
       }
     }
     .point-redeem-button {
-      width: 150px;
+      // width: 220px;
 
       max-height: 45px;
       display: flex;
@@ -85,4 +87,8 @@ input#epos_customer_id {
       }
     }
   }
+}
+
+.woocommerce .shop_table.woocommerce-checkout-review-order-table tr.fee td {
+  text-align: right;
 }
