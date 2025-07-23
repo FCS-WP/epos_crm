@@ -13,6 +13,7 @@ defined('ABSPATH') or die();
 use EPOS_CRM\Utils\Woo_Session_Handler;
 use EPOS_CRM\Utils\EPOS_CRM_Cart_Handler;
 use EPOS_CRM\Utils\Utils_Core;
+use EPOS_CRM\Src\Web\Epos_Crm_Web_Menu;
 
 class Epos_Crm_Web
 {
@@ -33,9 +34,12 @@ class Epos_Crm_Web
   public function __construct()
   {
 
-    /* Init Function */
+    /* Init Menu */
+    Epos_Crm_Web_Menu::get_instance();
+    // Login form
     add_shortcode('epos_crm_login_form', array($this, 'epos_crm_login_form_callback'));
 
+    // Login icon
     add_shortcode('epos_crm_login', array($this, 'epos_crm_login_icon_callback'));
 
     add_action('wp_footer', array($this, 'render_login_form'));
@@ -44,8 +48,7 @@ class Epos_Crm_Web
 
     add_action('woocommerce_thankyou',  array($this, 'action_payment_complete'));
 
-    add_action('woocommerce_after_order_details',  array($this, 'dislay_button_auto_login'));
-
+    add_action('woocommerce_after_order_details',  array($this, 'render_button_auto_login'));
 
     /* Epos_crm_web Assets  */
     add_action('wp_enqueue_scripts', array($this, 'epos_crm_web_assets'));
@@ -118,8 +121,10 @@ class Epos_Crm_Web
     $session->destroy('point_used');
   }
 
-  public function dislay_button_auto_login()
+  public function render_button_auto_login($order)
   {
+    // if (is_admin()) return;
+
     $session = new Woo_Session_Handler;
 
     $token = $session->get('epos_customer_token');

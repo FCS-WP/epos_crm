@@ -52,9 +52,9 @@ if (!defined('EPOS_CRM_API_NAMESPACE')) {
   define('EPOS_CRM_API_NAMESPACE', 'epos-crm/v1');
 }
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 /*-----------------------------------------------
  | Autoload & Includes
@@ -83,4 +83,5 @@ add_action('plugins_loaded', function () {
   Epos_Crm_Web::get_instance();
   Epos_Crm_Woocommerce::get_instance();
 });
+
 

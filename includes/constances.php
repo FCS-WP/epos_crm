@@ -29,3 +29,9 @@ if (!defined('EPOS_CRM_CUSTOMER_PORTAL_URL')) {
 if (!defined('EPOS_CRM_URL_SERVICE')) {
   define('EPOS_CRM_URL_SERVICE', 'https://livedevs.com');
 }
+if (!defined('EPOS_CRM_MEMBER_PORTAL_TEXT')) {
+  define('EPOS_CRM_MEMBER_PORTAL_TEXT', "Members' Portal");
+}
+if (!defined('EPOS_CRM_MENU_ITEM')) {
+  define('EPOS_CRM_MENU_ITEM', "EPOS_CRM_MENU");
+}
