@@ -84,6 +84,7 @@ class Epos_Crm_Web_Menu
       && strpos($item->post_name, self::MENU_POST_NAME) !== false
     ) {
       $customer_portal_url = $this->get_customer_portal_auto_login_url();
+      $itemOutput = '';
       if (!empty($customer_portal_url) && !is_admin()) {
         $itemOutput = '<a href="' . $customer_portal_url . '" target="__blank" class="elementor-item ' . $item->classes[0] . '">' . $item->title . '</a>';
       }
@@ -95,7 +96,6 @@ class Epos_Crm_Web_Menu
 
   public function nav_menu_links()
   {
-
     echo Utils_Core::get_template('menu-auto-login.php', array('post_name' => self::MENU_POST_NAME), dirname(__FILE__), '/templates');
   }
 }
