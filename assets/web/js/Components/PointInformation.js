@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,7 @@ const PointInformation = ({
           });
         }
 
-        if (value > points) {
+        if (value > convertPoint(points, pointRate)) {
           return createError({
             message:
               "You've entered more points than the points you currently can redeem",
@@ -63,6 +63,10 @@ const PointInformation = ({
     return points * rate;
   };
 
+  const covertToPoint = (cost, rate) => {
+    return cost / rate;
+  };
+
   const onSubmit = async (data) => {
     if (loading) return;
 
@@ -78,7 +82,10 @@ const PointInformation = ({
       if (data && data?.status == "success") {
         Toast({
           method: "success",
-          subtitle: "successfully.",
+          subtitle: `You have redeemed ${covertToPoint(
+            pointData.point_used,
+            pointRate
+          )} point(s) successfully.`,
         });
 
         // reset();
@@ -86,7 +93,8 @@ const PointInformation = ({
         const updateEvent = new Event("update_checkout", { bubbles: true });
         document.body.dispatchEvent(updateEvent);
       } else {
-        const errorMessage = data?.errors || "Failed to redeem point";
+        const errorMessage =
+          data?.errors || "Failed to redeem point. Please try again.";
         Toast({
           method: "error",
           subtitle: errorMessage,
@@ -95,7 +103,7 @@ const PointInformation = ({
     } catch (err) {
       Toast({
         method: "error",
-        subtitle: "An error occurred while updating your email",
+        subtitle: "An error occurred while redeeming point",
       });
     } finally {
       setLoading(false);
@@ -108,6 +116,20 @@ const PointInformation = ({
     const point = convertPoint(points, pointRate);
     setPoint(point);
   }, [points]);
+
+  const debounceTimer = useRef(null);
+
+  useEffect(() => {
+    if (!enteredPoint || !isValid) return;
+
+    clearTimeout(debounceTimer.current);
+
+    debounceTimer.current = setTimeout(() => {
+      handleSubmit(onSubmit)();
+    }, 1500);
+
+    return () => clearTimeout(debounceTimer.current);
+  }, [enteredPoint, isValid]);
 
   return (
     <form
@@ -137,7 +159,6 @@ const PointInformation = ({
           </label>
           <span> available to redeem</span>
           <label className="point-info__value">
-            {" "}
             ~ ${convertPoint(points, pointRate)}
           </label>
         </div>
@@ -153,17 +174,23 @@ const PointInformation = ({
           control={control}
           error={errors.point}
         />
-
-        <Button
-          disabled={!isValid || loading || !enteredPoint}
-          variant="contained"
-          type="submit"
-          className="point-redeem-button"
-          startIcon={loading && <CircularProgress size={16} />}
-        >
-          {loading ? "Applying..." : "Redeem Points"}
-        </Button>
+        <div className="point-redeem-button">
+          {loading && <CircularProgress size={16} />}
+        </div>
       </div>
+      {enteredPoint && isValid && (
+        <div className="point-info__group points_to_redeem">
+          <div className="point-info__detail">
+            <label>
+              <strong>Points to redeem: </strong>
+            </label>
+            <span>
+              ${enteredPoint} ~ {covertToPoint(Number(enteredPoint), pointRate)}
+              point(s)
+            </span>
+          </div>
+        </div>
+      )}
     </form>
   );
 };

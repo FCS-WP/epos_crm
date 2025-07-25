@@ -105,7 +105,7 @@ class Epos_Crm_Web
 
     $cart  =  new EPOS_CRM_Cart_Handler;
 
-    $total = $cart->get_cart_total();
+    $total = $cart->get_cart_sub_total();
 
     $customer_data = $session->get('epos_customer_data');
     if (empty($customer_data->active_member)) return;

@@ -99,4 +99,14 @@ class EPOS_CRM_Cart_Handler
   {
     return WC()->cart->get_total('edit'); // return float
   }
+
+   /**
+   * Get the cart total
+   *
+   * @return float
+   */
+  public function get_cart_sub_total()
+  {
+    return WC()->cart->get_subtotal('edit'); // return float
+  }
 }

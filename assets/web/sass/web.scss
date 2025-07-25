@@ -39,7 +39,7 @@ input#epos_customer_id {
   }
   .group_input {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 5px;
     .input-point {
       @include tablet {
