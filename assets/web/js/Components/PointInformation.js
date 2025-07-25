@@ -34,7 +34,7 @@ const PointInformation = ({
           });
         }
 
-        if (value > points) {
+        if (value > convertPoint(points, pointRate)) {
           return createError({
             message:
               "You've entered more points than the points you currently can redeem",
@@ -63,6 +63,10 @@ const PointInformation = ({
     return points * rate;
   };
 
+  const covertToPoint = (cost, rate) => {
+    return cost / rate;
+  };
+
   const onSubmit = async (data) => {
     if (loading) return;
 
@@ -78,7 +82,10 @@ const PointInformation = ({
       if (data && data?.status == "success") {
         Toast({
           method: "success",
-          subtitle: `You have redeemed ${pointData.point_used} point(s) successfully.`,
+          subtitle: `You have redeemed ${covertToPoint(
+            pointData.point_used,
+            pointRate
+          )} point(s) successfully.`,
         });
 
         // reset();
@@ -152,7 +159,6 @@ const PointInformation = ({
           </label>
           <span> available to redeem</span>
           <label className="point-info__value">
-            {" "}
             ~ ${convertPoint(points, pointRate)}
           </label>
         </div>
@@ -172,6 +178,19 @@ const PointInformation = ({
           {loading && <CircularProgress size={16} />}
         </div>
       </div>
+      {enteredPoint && isValid && (
+        <div className="point-info__group points_to_redeem">
+          <div className="point-info__detail">
+            <label>
+              <strong>Points to redeem: </strong>
+            </label>
+            <span>
+              ${enteredPoint} ~ {covertToPoint(Number(enteredPoint), pointRate)}
+              point(s)
+            </span>
+          </div>
+        </div>
+      )}
     </form>
   );
 };
