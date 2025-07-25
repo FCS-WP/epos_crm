@@ -5,6 +5,7 @@ namespace EPOS_CRM\Src\Woocommerce\Checkout;
 defined('ABSPATH') or die();
 
 use EPOS_CRM\Utils\Utils_Core;
+use EPOS_CRM\Utils\Woo_Session_Handler;
 
 
 class Epos_Crm_Checkout_Process
@@ -50,8 +51,13 @@ class Epos_Crm_Checkout_Process
     }
   }
 
-  private function epos_redeem_process_for_complete() {
+  private function epos_redeem_process_for_complete()
+  {
+    $session = new Woo_Session_Handler;
 
+    $session->delete_session();
+    // $session->destroy('is_used_redeem');
+    // $session->destroy('point_used');
   }
 
   private function validate_custom_discount_input()
