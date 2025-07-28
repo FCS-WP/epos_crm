@@ -37,15 +37,9 @@ class Epos_Crm_Checkout_Process
   {
     add_action('woocommerce_cart_calculate_fees', array($this, 'apply_redeem_point'));
 
-    // add_action('woocommerce_checkout_process', array($this, 'validate_custom_discount_input'));
-
     add_action('woocommerce_order_status_completed', array($this, 'redeem_process')); // Process or Completed order status
+
     add_action('woocommerce_order_status_processing', array($this, 'redeem_process')); // Process or Completed order status
-
-
-    //     add_action( 'woocommerce_order_status_completed', 'wc_maybe_reduce_stock_levels' );
-    // add_action( 'woocommerce_order_status_processing', 'wc_maybe_reduce_stock_levels' );
-    // add_action( 'woocommerce_payment_complete_order_status_processing', 'epos_redeem_process_for_complete' );
 
 
   }
@@ -90,13 +84,9 @@ class Epos_Crm_Checkout_Process
 
     $epos_customer_id = $order->get_meta('epos_customer_id');
 
-    $redeem = new Epos_Crm_Redeem_Process();
+    $redeem_api = new Epos_Crm_Redeem_Process();
 
-    $paid_date = $order->get_date_paid()->setTimezone(new DateTimeZone('UTC'));
-
-    $formatted_date = $paid_date->format('Y-m-d\TH:i:s\Z');
-
-    $transacted_at = $formatted_date ?? gmdate('Y-m-d\TH:i:s\Z');
+    $transacted_at =  gmdate('Y-m-d\TH:i:s\Z');
 
     $session = new Woo_Session_Handler;
 
@@ -111,13 +101,15 @@ class Epos_Crm_Checkout_Process
       'conversion_rate' =>  $customer_data->point_conversion_rate,
     );
 
-    $response = $redeem->API_redeem_process($request);
+    $response = $redeem_api->API_redeem_process($request);
 
     if (!isset($response['status']) || $response['status'] !== "success") {
       error_log('Redeem API failed: ' . print_r($response, true));
       $order->add_order_note(__('Redeem API failed. Check logs.'), false);
     } else {
       $order->add_order_note(__('Points redeemed successfully.' . $point_used . ''), false);
+      //Unset after done
+      $session->delete_redeem_session();
     }
   }
 }

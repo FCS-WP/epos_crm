@@ -72,11 +72,22 @@ class Woo_Session_Handler
   public function delete_session()
   {
     if (WC()->session) {
-      // var_dump($this->_customer_id);
       WC()->session->__unset('epos_customer_data');
       WC()->session->__unset('epos_customer_id');
       WC()->session->__unset('is_used_redeem');
       WC()->session->__unset('point_used');
+      WC()->session->__unset('points');
+    }
+  }
+  /**
+   * Delete the entire delete_redeem_session from cache and DB.
+   */
+  public function delete_redeem_session()
+  {
+    if (WC()->session) {
+      WC()->session->__unset('is_used_redeem');
+      WC()->session->__unset('point_used');
+      WC()->session->__unset('points');
     }
   }
 }
