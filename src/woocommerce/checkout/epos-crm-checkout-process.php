@@ -5,6 +5,9 @@ namespace EPOS_CRM\Src\Woocommerce\Checkout;
 defined('ABSPATH') or die();
 
 use EPOS_CRM\Utils\Utils_Core;
+use EPOS_CRM\Utils\Woo_Session_Handler;
+use DateTimeZone;
+use DateTime;
 
 
 class Epos_Crm_Checkout_Process
@@ -32,9 +35,17 @@ class Epos_Crm_Checkout_Process
   {
     add_action('woocommerce_cart_calculate_fees', array($this, 'apply_redeem_point'));
 
-    // add_action('woocommerce_checkout_process', array($this, 'validate_custom_discount_input'));
+    add_action('woocommerce_after_checkout_billing_form', array($this, 'epos_order_custom_fields'));
 
-    add_action('woocommerce_payment_complete', 'epos_redeem_process_for_complete'); // Process or Completed order status
+    //Make the Phone Number is Require
+    add_filter('woocommerce_billing_fields', array($this, 'make_phone_is_require'), 10, 1);
+  }
+
+
+  public function make_phone_is_require($address_fields)
+  {
+    $address_fields['billing_phone']['required'] = false;
+    return $address_fields;
   }
 
 
@@ -50,14 +61,30 @@ class Epos_Crm_Checkout_Process
     }
   }
 
-  private function epos_redeem_process_for_complete() {
+  public function epos_redeem_process_for_complete($order_id)
+  {
+    $session = new Woo_Session_Handler;
 
+    $session->delete_session();
   }
 
-  private function validate_custom_discount_input()
+  public function epos_order_custom_fields($checkout)
   {
-    if (!empty($_POST['custom_discount_amount']) && floatval($_POST['custom_discount_amount']) < 0) {
-      wc_add_notice(__('Discount must be a positive number.'), 'error');
-    }
+
+    $value = Utils_Core::create_guid();
+
+    $redeem_id = Utils_Core::create_guid();
+
+    woocommerce_form_field('epos_order_id', array(
+      'type'  => 'hidden',
+      'class'         => array('epos_order_id form-row-wide'),
+      'placeholder'   => __('epos_order_id'),
+    ), $value);
+
+    woocommerce_form_field('redeem_id', array(
+      'type'  => 'hidden',
+      'class'         => array('redeem_id form-row-wide'),
+      'placeholder'   => __('redeem_id'),
+    ), $redeem_id);
   }
 }

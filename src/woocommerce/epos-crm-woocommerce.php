@@ -102,6 +102,7 @@ class Epos_Crm_Woocommerce
   public function custom_override_checkout_fields($fields)
   {
     $fields['billing']['epos_customer_id'] = '';
+    $fields['billing']['epos_member_id'] = '';
     unset($fields['billing']['billing_company']);
     return $fields;
   }
@@ -118,6 +119,7 @@ class Epos_Crm_Woocommerce
 
     $session_user_data = !empty($session->get('epos_customer_data')) ? $session->get('epos_customer_data') : '';
     $session_user_id = !empty($session->get('epos_customer_id')) ? $session->get('epos_customer_id') : '';
+    $session_member_id = !empty($session->get('epos_member_id')) ? $session->get('epos_member_id') : '';
 
     if (!$session_user_data || !is_object($session_user_data)) {
       return $value;
@@ -132,6 +134,8 @@ class Epos_Crm_Woocommerce
         return $session_user_data->email ?? '';
       case 'epos_customer_id':
         return $session_user_id ?? '';
+      case 'epos_member_id':
+        return $session_member_id ?? '';
       case 'billing_phone':
         return $session_user_data->phone_number ?? '';
       case 'billing_address_1':

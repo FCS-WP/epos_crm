@@ -17,6 +17,7 @@ class Epos_Crm_Web_Menu
 {
 
   protected static $_instance = null;
+  const MENU_POST_NAME = 'epos_crm_menu';
 
   /**
    * @return Epos_Crm_Web_Menu
@@ -80,11 +81,12 @@ class Epos_Crm_Web_Menu
     if (
       ! empty($itemOutput)
       && is_string($itemOutput)
-      && strpos($itemOutput, EPOS_CRM_MENU_ITEM) !== false
+      && strpos($item->post_name, self::MENU_POST_NAME) !== false
     ) {
       $customer_portal_url = $this->get_customer_portal_auto_login_url();
-      if (!empty($customer_portal_url)) {
-        $itemOutput = '<a href="' . $customer_portal_url . '" class="elementor-item ' . $item->classes[0] . '">' . EPOS_CRM_MEMBER_PORTAL_TEXT . '</a>';
+      $itemOutput = '';
+      if (!empty($customer_portal_url) && !is_admin()) {
+        $itemOutput = '<a href="' . $customer_portal_url . '" target="__blank" class="elementor-item ' . $item->classes[0] . '">' . $item->title . '</a>';
       }
     }
 
@@ -94,7 +96,6 @@ class Epos_Crm_Web_Menu
 
   public function nav_menu_links()
   {
-
-    echo Utils_Core::get_template('button-auto-login.php', array(), dirname(__FILE__), '/templates');
+    echo Utils_Core::get_template('menu-auto-login.php', array('post_name' => self::MENU_POST_NAME), dirname(__FILE__), '/templates');
   }
 }

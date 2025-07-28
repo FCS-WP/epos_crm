@@ -55,6 +55,12 @@ class Customer_Routers
 
     ));
     register_rest_route(EPOS_CRM_API_NAMESPACE, '/customers', array(
+      'methods' => 'GET',
+      'callback' => [Epos_Customer_controller::class, 'get'],
+      'permission_callback' => array(Epos_Crm_Permission::class, 'zippy_permission_callback'),
+
+    ));
+    register_rest_route(EPOS_CRM_API_NAMESPACE, '/customers', array(
       'methods' => 'PATCH',
       'callback' => [Epos_Customer_controller::class, 'update'],
       'args' => Customer_Api_Model::update_args(),

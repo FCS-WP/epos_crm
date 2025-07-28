@@ -105,12 +105,14 @@ class Epos_Crm_Web
 
     $cart  =  new EPOS_CRM_Cart_Handler;
 
-    $total = $cart->get_cart_total();
+    $total = $cart->get_cart_sub_total();
 
     $customer_data = $session->get('epos_customer_data');
+
+    $applied_points = $session->get('point_used') ?? 0;
     if (empty($customer_data->active_member)) return;
 
-    echo Utils_Core::get_template('point-infomation.php', ['customer_data' => $customer_data, 'total' => $total], dirname(__FILE__), '/templates');
+    echo Utils_Core::get_template('point-infomation.php', ['customer_data' => $customer_data, 'total' => $total, 'applied_points' => $applied_points], dirname(__FILE__), '/templates');
   }
 
   public function action_payment_complete($order_id)

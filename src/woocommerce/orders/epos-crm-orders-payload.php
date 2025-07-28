@@ -10,17 +10,19 @@ use EPOS_CRM\Utils\Woo_Session_Handler;
 class Epos_Crm_Orders_Payload
 {
 
-  public static function build_order_meta_data($epos_customer_id, $order)
+  public static function build_order_meta_data($epos_customer_id, $order, $order_id, $redeem_id)
   {
 
 
-    $point_consumption = self::handle_build_point_payment($order);
+    $point_consumption = self::handle_build_point_payment($order, $redeem_id);
     $woo_payment = self::handle_build_woocommerce_payment($order);
-
+    $redeem_point = self::handle_get_redeem_point($order);
+    $grand_total = self::handle_get_total_order($order) + $redeem_point;
     $meta_data = array(
-      "order_id" => Utils_Core::create_guid(),
+      "order_id" => $order_id,
       "customer_id" => $epos_customer_id,
       "use_billing_info" => self::handle_get_ship_to_destination(),
+      "grand_total" => $grand_total,
       "payments" => array(
         $point_consumption,
         $woo_payment
@@ -45,12 +47,13 @@ class Epos_Crm_Orders_Payload
     return  array(
       "id" => Utils_Core::create_guid(),
       "strategy" => $order->get_payment_method_title(),
-      "value" => "500",
-      "transacted_at" => $order->get_date_created()
+      "value" => $order->get_total(),
+      "transacted_at" => $order->get_date_created()->format('Y-m-d H:m:s')
     );
   }
 
-  public static function handle_build_point_payment($order)
+
+  public static function handle_build_point_payment($order, $redeem_id)
   {
 
     $session = new Woo_Session_Handler;
@@ -60,14 +63,18 @@ class Epos_Crm_Orders_Payload
 
     $redeem_point = self::handle_get_redeem_point($order);
 
+    if (empty($redeem_point) || $redeem_point == 0) return;
+
+    $value = $customer_data->point_conversion_rate * $redeem_point;
+
     return  array(
       "id" => Utils_Core::create_guid(),
       "strategy" => "point_consumption",
-      "points_used" => $customer_data->point_balance,
+      "points_used" => $redeem_point,
       "conversion_rate" => $customer_data->point_conversion_rate,
-      "value" => $redeem_point,
-      "transacted_at" => $order->get_date_created(),
-      "redemption_id" => Utils_Core::create_guid()
+      "value" => $value,
+      "transacted_at" => $order->get_date_created()->format('Y-m-d H:m:s'),
+      "redemption_id" => $redeem_id
     );
   }
 
