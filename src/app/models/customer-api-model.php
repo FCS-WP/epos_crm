@@ -12,7 +12,7 @@ defined('ABSPATH') or die();
 
 class Customer_Api_Model
 {
-
+  
 
   public static function login_args()
   {
@@ -68,5 +68,5 @@ class Customer_Api_Model
     );
   }
 
- 
+
 }

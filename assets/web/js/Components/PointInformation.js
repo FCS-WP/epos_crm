@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import GroupIcon from "@mui/icons-material/Group";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
-import { Button, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import PointField from "./common/FormFields/PointField";
 import Toast from "./common/notifications/toast";
 import { webApi } from "../api";
@@ -15,20 +15,27 @@ const PointInformation = ({
   points = 0,
   pointRate = 0,
   cartTotal = 0,
-  currentPoints,
+  currentPoints = 0,
 }) => {
   if (!isOpen) return null;
 
-  const [point, setPoint] = useState(currentPoints);
+  const [pointBalance, setPointBalance] = useState(currentPoints);
+  const [pointRateState, setPointRate] = useState(pointRate);
+  const [loading, setLoading] = useState(false);
+  const debounceTimer = useRef(null);
+
+  const convertPoint = useCallback((points, rate) => points * rate, []);
+  const covertToPoint = useCallback((cost, rate) => cost / rate, []);
 
   const pointSchema = yup.object().shape({
     point: yup
-
       .number()
       .typeError("Point must be a number")
       .min(1, "You must redeem at least 1 point")
       .test("max-points-tiered", "", function (value) {
         const { createError } = this;
+
+        if (!value) return true;
 
         if (value > cartTotal) {
           return createError({
@@ -36,7 +43,7 @@ const PointInformation = ({
           });
         }
 
-        if (value > convertPoint(points, pointRate)) {
+        if (value > convertPoint(pointBalance, pointRateState)) {
           return createError({
             message:
               "You've entered more points than the points you currently can redeem",
@@ -45,7 +52,6 @@ const PointInformation = ({
         return true;
       }),
   });
-  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -57,81 +63,115 @@ const PointInformation = ({
     resolver: yupResolver(pointSchema),
     mode: "onChange",
     defaultValues: {
-      point: currentPoints,
+      point: currentPoints > 0 ? currentPoints : null,
     },
   });
 
-  const convertPoint = (points, rate) => {
-    return points * rate;
-  };
+  const enteredPoint = watch("point");
 
-  const covertToPoint = (cost, rate) => {
-    return cost / rate;
-  };
+  // API call for redeem
+  const onSubmit = useCallback(
+    async (data) => {
+      if (loading) return;
 
-  const onSubmit = async (data) => {
-    if (loading) return;
+      setLoading(true);
+      try {
+        const pointData = {
+          is_used: true,
+          point_used: data.point,
+          points: covertToPoint(Number(data.point), pointRateState),
+        };
 
-    setLoading(true);
+        const { data: response } = await webApi.pointRedeem(pointData);
 
-    const pointData = {
-      is_used: true,
-      point_used: data.point,
-      points: covertToPoint(Number(data.point), pointRate),
-    };
-    try {
-      const { data } = await webApi.pointRedeem(pointData);
-
-      if (data && data?.status == "success") {
-        const updateEvent = new Event("update_checkout", { bubbles: true });
-        document.body.dispatchEvent(updateEvent);
-
-        const submitBtn = document.getElementById("place_order");
-        if (submitBtn) submitBtn.disabled = false;
-      } else {
-        const errorMessage =
-          data?.errors || "Failed to redeem point. Please try again.";
+        if (response?.status === "success") {
+          document.body.dispatchEvent(
+            new Event("update_checkout", { bubbles: true })
+          );
+          const submitBtn = document.getElementById("place_order");
+          if (submitBtn) submitBtn.disabled = false;
+        } else {
+          Toast({
+            method: "error",
+            subtitle:
+              response?.errors || "Failed to redeem point. Please try again.",
+          });
+        }
+      } catch (err) {
         Toast({
           method: "error",
-          subtitle: errorMessage,
+          subtitle: "An error occurred while redeeming point",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loading, pointRateState]
+  );
+
+  // Fetch customer data
+  const fetchCustomerData = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const { data: response } = await webApi.getCustomer();
+
+      if (response?.status === "success") {
+        setPointBalance(response.data.point_balance);
+        setPointRate(response.data.point_conversion_rate);
+      } else {
+        Toast({
+          method: "error",
+          subtitle:
+            response?.errors || "Failed to fetch data point. Please try again.",
         });
       }
     } catch (err) {
       Toast({
         method: "error",
-        subtitle: "An error occurred while redeeming point",
+        subtitle: "An error occurred while fetching data point",
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  
-
-  const enteredPoint = watch("point");
-
+  // Fetch customer data when the first load or points change
   useEffect(() => {
-    const point = convertPoint(points, pointRate);
-    setPoint(point);
-  }, [points, currentPoints]);
+    if (points > 0) {
+      fetchCustomerData();
+    }
+    setPointBalance(convertPoint(points, pointRateState));
+    reset({ point: currentPoints > 0 ? currentPoints : null });
+  }, [
+    points,
+    currentPoints,
+    pointRateState,
+    fetchCustomerData,
+    convertPoint,
+    ,
+  ]);
 
-  const debounceTimer = useRef(null);
-
+  // Debounced auto-submit
   useEffect(() => {
+    const submitBtn = document.getElementById("place_order");
+
     if (!enteredPoint || !isValid) {
-      const submitBtn = document.getElementById("place_order");
       if (submitBtn) submitBtn.disabled = true;
       return;
     }
 
-    clearTimeout(debounceTimer.current);
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
     debounceTimer.current = setTimeout(() => {
       handleSubmit(onSubmit)();
     }, 1500);
 
-    return () => clearTimeout(debounceTimer.current);
-  }, [enteredPoint, isValid]);
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, [enteredPoint, isValid, handleSubmit]);
 
   return (
     <form
@@ -161,7 +201,7 @@ const PointInformation = ({
           </label>
           <span> available to redeem </span>
           <label className="point-info__value">
-            ~ ${convertPoint(points, pointRate)}
+            ~ ${convertPoint(points, pointRateState)}
           </label>
         </div>
       </div>
@@ -176,10 +216,13 @@ const PointInformation = ({
           control={control}
           error={errors.point}
         />
-        <div className="point-redeem-button">
-          {loading && <CircularProgress size={16} />}
-        </div>
+        {loading && (
+          <div className="point-redeem-button">
+            <CircularProgress size={16} />
+          </div>
+        )}
       </div>
+
       {enteredPoint && isValid && (
         <div className="point-info__group points_to_redeem">
           <div className="point-info__detail">
@@ -187,8 +230,8 @@ const PointInformation = ({
               <strong>Points to redeem: </strong>
             </label>
             <span>
-              ${enteredPoint} ~ {covertToPoint(Number(enteredPoint), pointRate)}
-              point(s)
+              ${enteredPoint} ~{" "}
+              {covertToPoint(Number(enteredPoint), pointRateState)} point(s)
             </span>
           </div>
         </div>
