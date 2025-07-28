@@ -65,7 +65,7 @@ class Epos_Customer_controller
         $session = new Woo_Session_Handler;
         $session->init_session();
         $session->set(self::$customer_key, $data->attributes);
-        $session->set(self::$customer_id, $data->id);
+        $session->set(self::$customer_id, $data->attributes->member_id);
         $session->set(self::$epos_customer_token, $epos_customer_token);
       }
     }
@@ -84,7 +84,7 @@ class Epos_Customer_controller
         $session = new Woo_Session_Handler;
         $session->init_session();
         $session->set(self::$customer_key, $data);
-        $session->set(self::$customer_id, $data->id);
+        $session->set(self::$customer_id, $data->member_id);
       }
     }
 

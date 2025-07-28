@@ -75,23 +75,18 @@ const PointInformation = ({
     const pointData = {
       is_used: true,
       point_used: data.point,
+      points: covertToPoint(Number(data.point), pointRate),
     };
     try {
       const { data } = await webApi.pointRedeem(pointData);
 
       if (data && data?.status == "success") {
-        Toast({
-          method: "success",
-          subtitle: `You have redeemed ${covertToPoint(
-            pointData.point_used,
-            pointRate
-          )} point(s) successfully.`,
-        });
-
-        // reset();
 
         const updateEvent = new Event("update_checkout", { bubbles: true });
         document.body.dispatchEvent(updateEvent);
+
+        const submitBtn = document.getElementById("place_order");
+        if (submitBtn) submitBtn.disabled = false;
       } else {
         const errorMessage =
           data?.errors || "Failed to redeem point. Please try again.";
@@ -120,7 +115,11 @@ const PointInformation = ({
   const debounceTimer = useRef(null);
 
   useEffect(() => {
-    if (!enteredPoint || !isValid) return;
+    if (!enteredPoint || !isValid) {
+      const submitBtn = document.getElementById("place_order");
+      if (submitBtn) submitBtn.disabled = true;
+      return;
+    }
 
     clearTimeout(debounceTimer.current);
 
@@ -157,7 +156,7 @@ const PointInformation = ({
           <label>
             <strong>{points} Point(s)</strong>
           </label>
-          <span> available to redeem</span>
+          <span> available to redeem </span>
           <label className="point-info__value">
             ~ ${convertPoint(points, pointRate)}
           </label>

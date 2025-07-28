@@ -40,17 +40,20 @@ class Epos_Orders_Controller
 
       $point_used = sanitize_text_field($request['point_used'] ?? 0);
       $is_used_redeem = sanitize_text_field($request['is_used'] ?? false);
+      $points = number_format((float)sanitize_text_field($request['points'] ?? 0), 2, '.', '');
 
 
       $session = new Woo_Session_Handler;
       $session->set('is_used_redeem', $is_used_redeem);
       $session->set('point_used', $point_used);
+      $session->set('points', $points);
 
       return Zippy_Response_Handler::success([
         'message' => 'Point redeem applied successfully.',
         'data' => [
           'is_used' => $is_used_redeem,
           'point_used' => $point_used,
+          'points' => $points,
         ]
       ]);
     } catch (Exception $e) {

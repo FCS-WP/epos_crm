@@ -37,6 +37,8 @@ class Epos_Crm_Orders
     add_action('woocommerce_checkout_update_order_meta', array($this, 'add_order_meta_data'));
     //Make the Phone Number is Require
     add_filter('woocommerce_billing_fields', array($this, 'make_phone_is_require'), 10, 1);
+
+    add_action('woocommerce_after_checkout_billing_form', array($this, 'add_epos_order_id'));
   }
 
 
@@ -50,15 +52,46 @@ class Epos_Crm_Orders
   {
     $epos_customer_id = $_POST['epos_customer_id'];
 
+    $epos_order_id = $_POST['epos_order_id'];
+
+    $redeem_id = $_POST['redeem_id'];
+
     if (! empty($epos_customer_id) && !empty($order_id)) {
 
       $order = new WC_Order($order_id);
 
-      $meta_data = Epos_Crm_Orders_Payload::build_order_meta_data($epos_customer_id, $order);
+      $meta_data = Epos_Crm_Orders_Payload::build_order_meta_data($epos_customer_id, $order, $epos_order_id);
 
       $order->update_meta_data('epos_crm', $meta_data, true);
 
+      $order->update_meta_data('epos_order_id', $epos_order_id, true);
+
+      $order->update_meta_data('redeem_id', $redeem_id, true);
+
+      $order->update_meta_data('epos_customer_id', $epos_customer_id, true);
+
       $order->save_meta_data();
     }
+  }
+
+
+  public function add_epos_order_id($checkout)
+  {
+
+    $value = Utils_Core::create_guid();
+
+    $redeem_id = Utils_Core::create_guid();
+
+    woocommerce_form_field('epos_order_id', array(
+      'type'  => 'hidden',
+      'class'         => array('epos_order_id form-row-wide'),
+      'placeholder'   => __('epos_order_id'),
+    ), $value);
+
+    woocommerce_form_field('redeem_id', array(
+      'type'  => 'hidden',
+      'class'         => array('redeem_id form-row-wide'),
+      'placeholder'   => __('redeem_id'),
+    ), $redeem_id);
   }
 }

@@ -6,6 +6,10 @@ defined('ABSPATH') or die();
 
 use EPOS_CRM\Utils\Utils_Core;
 use EPOS_CRM\Utils\Woo_Session_Handler;
+use EPOS_CRM\Src\Woocommerce\Checkout\Epos_Crm_Redeem_Process;
+use DateTimeZone;
+use DateTime;
+use WC_Order;
 
 
 class Epos_Crm_Checkout_Process
@@ -35,7 +39,15 @@ class Epos_Crm_Checkout_Process
 
     // add_action('woocommerce_checkout_process', array($this, 'validate_custom_discount_input'));
 
-    add_action('woocommerce_payment_complete', 'epos_redeem_process_for_complete'); // Process or Completed order status
+    add_action('woocommerce_order_status_completed', array($this, 'redeem_process')); // Process or Completed order status
+    add_action('woocommerce_order_status_processing', array($this, 'redeem_process')); // Process or Completed order status
+
+
+    //     add_action( 'woocommerce_order_status_completed', 'wc_maybe_reduce_stock_levels' );
+    // add_action( 'woocommerce_order_status_processing', 'wc_maybe_reduce_stock_levels' );
+    // add_action( 'woocommerce_payment_complete_order_status_processing', 'epos_redeem_process_for_complete' );
+
+
   }
 
 
@@ -51,19 +63,61 @@ class Epos_Crm_Checkout_Process
     }
   }
 
-  private function epos_redeem_process_for_complete()
+  public function epos_redeem_process_for_complete($order_id)
   {
     $session = new Woo_Session_Handler;
 
     $session->delete_session();
-    // $session->destroy('is_used_redeem');
-    // $session->destroy('point_used');
   }
 
-  private function validate_custom_discount_input()
+
+  public function redeem_process($order_id)
   {
-    if (!empty($_POST['custom_discount_amount']) && floatval($_POST['custom_discount_amount']) < 0) {
-      wc_add_notice(__('Discount must be a positive number.'), 'error');
+
+    $is_used_redeem = WC()->session->get('is_used_redeem');
+
+    $point_used = WC()->session->get('points');
+
+    if (empty($is_used_redeem) || empty($point_used)) {
+      return;
+    }
+
+    $order = new WC_Order($order_id);
+
+    $redeem_id = $order->get_meta('redeem_id');
+
+    $epos_order_id = $order->get_meta('epos_order_id');
+
+    $epos_customer_id = $order->get_meta('epos_customer_id');
+
+    $redeem = new Epos_Crm_Redeem_Process();
+
+    $paid_date = $order->get_date_paid()->setTimezone(new DateTimeZone('UTC'));
+
+    $formatted_date = $paid_date->format('Y-m-d\TH:i:s\Z');
+
+    $transacted_at = $formatted_date ?? gmdate('Y-m-d\TH:i:s\Z');
+
+    $session = new Woo_Session_Handler;
+
+    $customer_data = $session->get('epos_customer_data');
+
+    $request = array(
+      'id' => $redeem_id,
+      'order_id' => $epos_order_id,
+      'member_id' => $epos_customer_id,
+      'points' => $point_used,
+      'transacted_at' => $transacted_at,
+      'conversion_rate' =>  $customer_data->point_conversion_rate,
+    );
+
+    $response = $redeem->API_redeem_process($request);
+
+    if (!isset($response['status']) || $response['status'] !== "success") {
+      error_log('Redeem API failed: ' . print_r($response, true));
+      $order->add_order_note(__('Redeem API failed. Check logs.'), false);
+    } else {
+      $order->add_order_note(__('Points redeemed successfully.' . $point_used . ''), false);
     }
   }
 }

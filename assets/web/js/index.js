@@ -47,14 +47,22 @@ document.addEventListener("DOMContentLoaded", function () {
   if (epos_crm_point_information) {
     const pointInfoRoot = ReactDOM.createRoot(epos_crm_point_information);
     const points = parseInt(epos_crm_point_information?.dataset?.points) || 0;
+    const membershipTier =
+      parseInt(epos_crm_point_information?.dataset?.tierName) || "";
     const pointRate =
       parseFloat(epos_crm_point_information?.dataset?.pointRate) || 0;
-       const cartTotal =
+    const cartTotal =
       parseFloat(epos_crm_point_information?.dataset?.cartTotal) || 0;
     pointInfoRoot.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <PointInformation isOpen={true} points={points} pointRate={pointRate} cartTotal={cartTotal} />
+        <PointInformation
+          isOpen={true}
+          points={points}
+          pointRate={pointRate}
+          cartTotal={cartTotal}
+          membershipTier={membershipTier}
+        />
         <ToastContainer />
       </ThemeProvider>
     );

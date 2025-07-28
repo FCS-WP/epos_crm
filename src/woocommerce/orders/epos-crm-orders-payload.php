@@ -10,7 +10,7 @@ use EPOS_CRM\Utils\Woo_Session_Handler;
 class Epos_Crm_Orders_Payload
 {
 
-  public static function build_order_meta_data($epos_customer_id, $order)
+  public static function build_order_meta_data($epos_customer_id, $order, $order_id)
   {
 
 
@@ -19,7 +19,7 @@ class Epos_Crm_Orders_Payload
     $redeem_point = self::handle_get_redeem_point($order);
     $grand_total = self::handle_get_total_order($order) + $redeem_point;
     $meta_data = array(
-      "order_id" => Utils_Core::create_guid(),
+      "order_id" => $order_id,
       "customer_id" => $epos_customer_id,
       "use_billing_info" => self::handle_get_ship_to_destination(),
       "grand_total" => $grand_total,

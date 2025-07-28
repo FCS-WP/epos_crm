@@ -102,6 +102,8 @@ class Epos_Crm_Woocommerce
   public function custom_override_checkout_fields($fields)
   {
     $fields['billing']['epos_customer_id'] = '';
+    $fields['billing']['epos_order_id'] = '';
+    $fields['billing']['redeem_id'] = '';
     unset($fields['billing']['billing_company']);
     return $fields;
   }
