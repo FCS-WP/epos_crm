@@ -53,6 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
       parseFloat(epos_crm_point_information?.dataset?.pointRate) || 0;
     const cartTotal =
       parseFloat(epos_crm_point_information?.dataset?.cartTotal) || 0;
+    const appliedPoints =
+      parseFloat(epos_crm_point_information?.dataset?.appliedPoints) || 0;
     pointInfoRoot.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
@@ -62,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
           pointRate={pointRate}
           cartTotal={cartTotal}
           membershipTier={membershipTier}
+          currentPoints={appliedPoints}
         />
         <ToastContainer />
       </ThemeProvider>

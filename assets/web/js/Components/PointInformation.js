@@ -15,13 +15,15 @@ const PointInformation = ({
   points = 0,
   pointRate = 0,
   cartTotal = 0,
+  currentPoints,
 }) => {
   if (!isOpen) return null;
 
-  const [point, setPoint] = useState(0);
+  const [point, setPoint] = useState(currentPoints);
 
   const pointSchema = yup.object().shape({
     point: yup
+
       .number()
       .typeError("Point must be a number")
       .min(1, "You must redeem at least 1 point")
@@ -55,7 +57,7 @@ const PointInformation = ({
     resolver: yupResolver(pointSchema),
     mode: "onChange",
     defaultValues: {
-      point: "",
+      point: currentPoints,
     },
   });
 
@@ -81,7 +83,6 @@ const PointInformation = ({
       const { data } = await webApi.pointRedeem(pointData);
 
       if (data && data?.status == "success") {
-
         const updateEvent = new Event("update_checkout", { bubbles: true });
         document.body.dispatchEvent(updateEvent);
 
@@ -105,12 +106,14 @@ const PointInformation = ({
     }
   };
 
+  
+
   const enteredPoint = watch("point");
 
   useEffect(() => {
     const point = convertPoint(points, pointRate);
     setPoint(point);
-  }, [points]);
+  }, [points, currentPoints]);
 
   const debounceTimer = useRef(null);
 

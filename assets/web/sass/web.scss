@@ -1,4 +1,9 @@
-input#epos_customer_id {
+input#epos_customer_id, #epos_customer_id_field {
+  display: none;
+  visibility: hidden;
+}
+
+input#epos_member_id, #epos_member_id_field {
   display: none;
   visibility: hidden;
 }

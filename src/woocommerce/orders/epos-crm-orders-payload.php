@@ -10,11 +10,11 @@ use EPOS_CRM\Utils\Woo_Session_Handler;
 class Epos_Crm_Orders_Payload
 {
 
-  public static function build_order_meta_data($epos_customer_id, $order, $order_id)
+  public static function build_order_meta_data($epos_customer_id, $order, $order_id, $redeem_id)
   {
 
 
-    $point_consumption = self::handle_build_point_payment($order);
+    $point_consumption = self::handle_build_point_payment($order, $redeem_id);
     $woo_payment = self::handle_build_woocommerce_payment($order);
     $redeem_point = self::handle_get_redeem_point($order);
     $grand_total = self::handle_get_total_order($order) + $redeem_point;
@@ -53,7 +53,7 @@ class Epos_Crm_Orders_Payload
   }
 
 
-  public static function handle_build_point_payment($order)
+  public static function handle_build_point_payment($order, $redeem_id)
   {
 
     $session = new Woo_Session_Handler;
@@ -74,7 +74,7 @@ class Epos_Crm_Orders_Payload
       "conversion_rate" => $customer_data->point_conversion_rate,
       "value" => $value,
       "transacted_at" => $order->get_date_created()->format('Y-m-d H:m:s'),
-      "redemption_id" => Utils_Core::create_guid()
+      "redemption_id" => $redeem_id
     );
   }
 
