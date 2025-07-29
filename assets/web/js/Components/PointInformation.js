@@ -144,14 +144,7 @@ const PointInformation = ({
     }
     setPointBalance(convertPoint(points, pointRateState));
     reset({ point: currentPoints > 0 ? currentPoints : null });
-  }, [
-    points,
-    currentPoints,
-    pointRateState,
-    fetchCustomerData,
-    convertPoint,
-    ,
-  ]);
+  }, [points, currentPoints, fetchCustomerData, convertPoint, ,]);
 
   // Debounced auto-submit
   useEffect(() => {

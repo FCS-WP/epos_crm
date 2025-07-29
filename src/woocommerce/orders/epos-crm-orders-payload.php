@@ -65,14 +65,14 @@ class Epos_Crm_Orders_Payload
 
     if (empty($redeem_point) || $redeem_point == 0) return;
 
-    $value = $customer_data->point_conversion_rate * $redeem_point;
+    $value = round((float) $redeem_point / (float) $customer_data->point_conversion_rate, 2);
 
     return  array(
       "id" => Utils_Core::create_guid(),
       "strategy" => "point_consumption",
-      "points_used" => $redeem_point,
+      "points_used" =>  $value,
       "conversion_rate" => $customer_data->point_conversion_rate,
-      "value" => $value,
+      "value" => $redeem_point,
       "transacted_at" => $order->get_date_created()->format('Y-m-d H:m:s'),
       "redemption_id" => $redeem_id
     );
