@@ -225,7 +225,7 @@ class Epos_Customer_controller
         $session = new Woo_Session_Handler;
         $session->init_session();
         $session->set(self::$customer_key, $data);
-        $session->set(self::$customer_id, $data->member_id);
+        $session->set(self::$customer_id, $data->id);
         $session->set(self::$member_id, $data->member_id);
         $session->set(self::$phone_number, $data->phone_number);
       }
@@ -411,7 +411,6 @@ class Epos_Customer_controller
 
       $phone_number = $session->get(self::$phone_number);
 
-      // var_dump($phone_number);
       $params = [
         "phone_number" => sanitize_text_field($phone_number),
         "exclude_deleted" => 'true',

@@ -40,7 +40,7 @@ class Epos_Crm_Redeem_Process
         "member_id"       => sanitize_text_field($request["member_id"]),
         "points"          => (float)$request["points"],
         "transacted_at"   => sanitize_text_field($request["transacted_at"]),
-        "tier_id"         => "ca87d9d0-52ad-4a6b-bf3e-461c5ff63eec",
+        "tier_id"         => sanitize_text_field($request["tier_id"]),
         "conversion_rate" => (float) $request["conversion_rate"],
       ];
 

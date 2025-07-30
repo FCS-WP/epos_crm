@@ -31,7 +31,7 @@ const PointInformation = ({
     point: yup
       .number()
       .typeError("Point must be a number")
-      .min(1, "You must redeem at least 1 point")
+      .min(0, "You must redeem at least 0 point")
       .test("max-points-tiered", "", function (value) {
         const { createError } = this;
 

@@ -107,3 +107,22 @@ p.MuiFormHelperText-root {
   max-height: 45px;
   margin-bottom: 24px !important;
 }
+
+.member_auto_login {
+  font-size: 16px !important;
+  font-weight: bold;
+  display: flex;
+  margin-bottom: 24px !important;
+  align-items: center;
+  &__link {
+    display: flex;
+    .icon {
+      .icon-text {
+        color: $primary;
+        font-weight: bold;
+      }
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+}

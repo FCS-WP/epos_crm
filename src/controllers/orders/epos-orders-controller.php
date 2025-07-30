@@ -28,7 +28,7 @@ class Epos_Orders_Controller
       $validationRules = [
         "point_used" => [
           "required" => true,
-          "data_type" => "float",
+          // "data_type" => "float",
         ],
       ];
 
