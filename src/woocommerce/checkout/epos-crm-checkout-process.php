@@ -56,7 +56,7 @@ class Epos_Crm_Checkout_Process
     $point_used = WC()->session->get('point_used');
 
     //handle remove
-    if ($point_used == 0) {
+    if ($point_used == 0 ) {
       foreach ($cart->get_fees() as $key => $fee) {
         if ($fee->name === EPOS_CRM_REDEEM) {
           unset($cart->fees_api()->fees[$key]);
