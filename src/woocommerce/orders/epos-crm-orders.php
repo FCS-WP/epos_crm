@@ -106,6 +106,7 @@ class Epos_Crm_Orders
       'id' => $redeem_id,
       'order_id' => $epos_order_id,
       'member_id' => $epos_member_id,
+      'tier_id' => $customer_data->tier_id,
       'points' => $point_used,
       'transacted_at' => $transacted_at,
       'conversion_rate' =>  $customer_data->point_conversion_rate,
@@ -124,7 +125,6 @@ class Epos_Crm_Orders
       $session->delete_redeem_session();
     }
   }
-
 
   public function is_apply_redeem()
   {

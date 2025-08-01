@@ -6,8 +6,7 @@ defined('ABSPATH') or die();
 
 use EPOS_CRM\Utils\Utils_Core;
 use EPOS_CRM\Utils\Woo_Session_Handler;
-use DateTimeZone;
-use DateTime;
+
 
 
 class Epos_Crm_Checkout_Process
@@ -55,11 +54,23 @@ class Epos_Crm_Checkout_Process
 
     $is_used_redeem = WC()->session->get('is_used_redeem');
     $point_used = WC()->session->get('point_used');
+
+    //handle remove
+    if ($point_used == 0) {
+      foreach ($cart->get_fees() as $key => $fee) {
+        if ($fee->name === EPOS_CRM_REDEEM) {
+          unset($cart->fees_api()->fees[$key]);
+        }
+      }
+    }
+
     if ($is_used_redeem && $point_used > 0) {
       $discount = $point_used * -1;
       $cart->add_fee(EPOS_CRM_REDEEM, $discount);
     }
   }
+
+
 
   public function epos_redeem_process_for_complete($order_id)
   {

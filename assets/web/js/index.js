@@ -47,8 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (epos_crm_point_information) {
     const pointInfoRoot = ReactDOM.createRoot(epos_crm_point_information);
     const points = parseInt(epos_crm_point_information?.dataset?.points) || 0;
-    const membershipTier =
-      parseInt(epos_crm_point_information?.dataset?.tierName) || "";
+    const membershipTier = epos_crm_point_information?.dataset?.tierName || "";
     const pointRate =
       parseFloat(epos_crm_point_information?.dataset?.pointRate) || 0;
     const cartTotal =

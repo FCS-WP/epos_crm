@@ -14,20 +14,25 @@ class Epos_Crm_Orders_Payload
   {
 
 
-    $point_consumption = self::handle_build_point_payment($order, $redeem_id);
-    $woo_payment = self::handle_build_woocommerce_payment($order);
+    $point_consumption = self::handle_build_point_payment($order, $redeem_id) ?? [];
+    $woo_payment = self::handle_build_woocommerce_payment($order) ?? [];
     $redeem_point = self::handle_get_redeem_point($order);
     $grand_total = self::handle_get_total_order($order) + $redeem_point;
+    $payments = array_merge($point_consumption, $woo_payment);
+
+    $payments = array_values(array_filter([
+      $point_consumption,
+      $woo_payment
+    ], function ($payment) {
+      return !empty($payment);
+    }));
+
     $meta_data = array(
       "order_id" => $order_id,
       "customer_id" => $epos_customer_id,
       "use_billing_info" => self::handle_get_ship_to_destination(),
       "grand_total" => $grand_total,
-      "payments" => array(
-        $point_consumption,
-        $woo_payment
-
-      )
+      "payments" => $payments
     );
 
     return json_encode($meta_data);
@@ -65,14 +70,14 @@ class Epos_Crm_Orders_Payload
 
     if (empty($redeem_point) || $redeem_point == 0) return;
 
-    $value = $customer_data->point_conversion_rate * $redeem_point;
+    $value = round((float) $redeem_point / (float) $customer_data->point_conversion_rate, 2);
 
     return  array(
       "id" => Utils_Core::create_guid(),
       "strategy" => "point_consumption",
-      "points_used" => $redeem_point,
+      "points_used" =>  $value,
       "conversion_rate" => $customer_data->point_conversion_rate,
-      "value" => $value,
+      "value" => $redeem_point,
       "transacted_at" => $order->get_date_created()->format('Y-m-d H:m:s'),
       "redemption_id" => $redeem_id
     );

@@ -125,11 +125,11 @@ class Epos_Crm_Web
 
   public function render_button_auto_login($order)
   {
-    // if (is_admin()) return;
 
     $session = new Woo_Session_Handler;
 
     $token = $session->get('epos_customer_token');
+
 
     $tanent_domain =  get_option('epos_be_url', null);
 
@@ -141,7 +141,13 @@ class Epos_Crm_Web
 
     $customer_portal_url = $query_string . build_query(array('token' => $token, 'tenant' => $tenant_name));
 
-    echo Utils_Core::get_template('button-auto-login.php', ['customer_portal_url' => $customer_portal_url], dirname(__FILE__), '/templates');
+    $id_member = $session->get('epos_member_id');
+    if (!empty($id_member)) {
+    echo Utils_Core::get_template('member_auto-login.php', ['customer_portal_url' => $customer_portal_url], dirname(__FILE__), '/templates');
+
+    } else {
+      echo Utils_Core::get_template('button-auto-login.php', ['customer_portal_url' => $customer_portal_url], dirname(__FILE__), '/templates');
+    }
   }
 
   private function get_logo_url()

@@ -15,6 +15,7 @@ use EPOS_CRM\Utils\EPOS_Helper;
 use EPOS_CRM\Utils\Woo_Session_Handler;
 use EPOS_CRM\Src\Woocommerce\Orders\Epos_Crm_Orders;
 use EPOS_CRM\Src\Woocommerce\Checkout\Epos_Crm_Checkout_Process;
+use EPOS_CRM\Src\Woocommerce\Webhooks\Epos_Crm_Woocommerce_Webhook;
 
 class Epos_Crm_Woocommerce
 {
@@ -53,6 +54,9 @@ class Epos_Crm_Woocommerce
 
     /* Init handle Process checkout */
     Epos_Crm_Checkout_Process::get_instance();
+
+    /* Init handle Webhook */
+    Epos_Crm_Woocommerce_Webhook::get_instance();
   }
 
   protected function set_hooks()
