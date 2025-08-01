@@ -223,7 +223,6 @@ class Epos_Customer_controller
       $response['data'] = $data;
       if (!empty($data)) {
         $session = new Woo_Session_Handler;
-        $session->init_session();
         $session->set(self::$customer_key, $data);
         $session->set(self::$customer_id, $data->id);
         $session->set(self::$member_id, $data->member_id);

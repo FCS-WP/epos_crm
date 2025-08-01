@@ -45,11 +45,9 @@ class Epos_Orders_Controller
 
       $session = new Woo_Session_Handler;
 
-      if ($points > 0) {
-        $session->set('is_used_redeem', $is_used_redeem);
-        $session->set('point_used', $point_used);
-        $session->set('points', $points);
-      }
+      $session->set('is_used_redeem', $is_used_redeem);
+      $session->set('point_used', $point_used);
+      $session->set('points', $points);
 
 
       return Zippy_Response_Handler::success([
