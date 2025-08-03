@@ -54,6 +54,10 @@ document.addEventListener("DOMContentLoaded", function () {
       parseFloat(epos_crm_point_information?.dataset?.cartTotal) || 0;
     const appliedPoints =
       parseFloat(epos_crm_point_information?.dataset?.appliedPoints) || 0;
+    const isRedeemableLimit =
+      parseFloat(epos_crm_point_information?.dataset?.redeemableLimit) || 0;
+    const redeemableLimit =
+      parseFloat(epos_crm_point_information?.dataset?.redeemableAmount) || 0;
     pointInfoRoot.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
@@ -63,6 +67,8 @@ document.addEventListener("DOMContentLoaded", function () {
           pointRate={pointRate}
           cartTotal={cartTotal}
           membershipTier={membershipTier}
+          redeemableLimit={redeemableLimit}
+          isRedeemableLimit={isRedeemableLimit}
           currentPoints={appliedPoints}
         />
         <ToastContainer />

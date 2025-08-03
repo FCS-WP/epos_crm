@@ -98,7 +98,12 @@ p.MuiFormHelperText-root {
 }
 
 // Button Auto Login
-
+button.epos-btn {
+  color: #fff !important;
+  &:hover {
+    color: #fff !important;
+  }
+}
 .epos-btn__auto_login {
   display: flex !important;
   justify-content: center;
