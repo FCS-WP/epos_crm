@@ -74,6 +74,7 @@ class Woo_Session_Handler
     if (WC()->session) {
       WC()->session->__unset('epos_customer_data');
       WC()->session->__unset('epos_customer_id');
+      WC()->session->__unset('epos_customer_token');
       WC()->session->__unset('is_used_redeem');
       WC()->session->__unset('point_used');
       WC()->session->__unset('points');
