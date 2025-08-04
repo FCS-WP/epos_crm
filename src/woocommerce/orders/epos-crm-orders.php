@@ -44,7 +44,7 @@ class Epos_Crm_Orders
 
     add_action('woocommerce_checkout_create_order', array($this, 'remove_refund_process'));
 
-    // add_action('woocommerce_order_status_completed', array($this, 'redeem_process')); // Process or Completed order status
+    // add_action('woocommerce_order_status_cancel', array($this, 'redeem_prefund')); // Process or Completed order status
 
     // add_action('woocommerce_order_status_processing', array($this, 'redeem_process')); // Process or Completed order status
 
@@ -57,7 +57,7 @@ class Epos_Crm_Orders
 
     $point_used = WC()->session->get('points');
 
-    if (empty($is_used_redeem) || empty($point_used)) {
+    if (empty($is_used_redeem) || empty($point_used) || $point_used <= 0) {
       return;
     }
 

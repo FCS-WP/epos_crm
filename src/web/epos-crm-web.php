@@ -110,7 +110,7 @@ class Epos_Crm_Web
     $customer_data = $session->get('epos_customer_data');
 
     $applied_points = $session->get('point_used') ?? 0;
-    if (empty($customer_data->active_member)) return;
+    if (empty($customer_data->active_member) || $customer_data->point_balance <= 0) return;
 
     echo Utils_Core::get_template('point-infomation.php', ['customer_data' => $customer_data, 'total' => $total, 'applied_points' => $applied_points], dirname(__FILE__), '/templates');
   }
@@ -128,11 +128,13 @@ class Epos_Crm_Web
   {
     $session = new Woo_Session_Handler;
 
+    $customer_data = $session->get('epos_customer_data');
+
     $token = $session->get('epos_customer_token');
 
     $tanent_domain =  get_option('epos_be_url', null);
 
-    if (empty($token) || empty($tanent_domain)) return;
+    if (empty($token) || empty($tanent_domain) || !$customer_data->active_member) return;
 
     $query_string = EPOS_CRM_CUSTOMER_PORTAL_URL . '/api/auto-login?';
 
@@ -143,8 +145,6 @@ class Epos_Crm_Web
     $id_member = $session->get('epos_member_id');
     if (!empty($id_member)) {
       echo Utils_Core::get_template('member_auto-login.php', ['customer_portal_url' => $customer_portal_url], dirname(__FILE__), '/templates');
-    } else {
-      echo Utils_Core::get_template('button-auto-login.php', ['customer_portal_url' => $customer_portal_url], dirname(__FILE__), '/templates');
     }
   }
 
