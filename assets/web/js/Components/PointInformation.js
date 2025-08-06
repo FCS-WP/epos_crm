@@ -35,14 +35,18 @@ const PointInformation = ({
   const convertPoint = useCallback(
     (points, rate) => {
       const value = points * rate;
-      const clampedValue = value > redeemableLimit ? redeemableLimit : value;
-      return Math.round(clampedValue * 100) / 100;
+      if (isRedeemableLimit) {
+        const clampedValue = value > redeemableLimit ? redeemableLimit : value;
+        return Math.round(clampedValue * 100) / 100;
+      } else {
+        return value;
+      }
     },
     [redeemableLimit]
   );
   const convertToPoint = useCallback((cost, rate) => cost / rate, []);
 
-  // ✅ Validation schema (memoized)
+  // Validation schema (memoized)
   const pointSchema = useMemo(
     () =>
       yup.object().shape({
@@ -97,7 +101,7 @@ const PointInformation = ({
 
   const enteredPoint = watch("point");
 
-  // ✅ Redeem handler
+  // Redeem handler
   const onSubmit = useCallback(
     async ({ point }) => {
       if (loading) return;
