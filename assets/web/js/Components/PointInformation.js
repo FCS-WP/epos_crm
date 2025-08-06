@@ -32,7 +32,14 @@ const PointInformation = ({
   const [loading, setLoading] = useState(false);
   const debounceTimer = useRef(null);
 
-  const convertPoint = useCallback((points, rate) => points * rate, []);
+  const convertPoint = useCallback(
+    (points, rate) => {
+      const value = points * rate;
+      const clampedValue = value > redeemableLimit ? redeemableLimit : value;
+      return Math.round(clampedValue * 100) / 100;
+    },
+    [redeemableLimit]
+  );
   const convertToPoint = useCallback((cost, rate) => cost / rate, []);
 
   // ✅ Validation schema (memoized)
@@ -54,9 +61,7 @@ const PointInformation = ({
               });
             }
 
-            const maxRedeemable = isRedeemableLimit
-              ? redeemableLimit
-              : convertPoint(pointBalance, pointRateState);
+            const maxRedeemable = convertPoint(pointBalance, pointRateState);
 
             if (value > maxRedeemable) {
               return createError({
@@ -211,10 +216,7 @@ const PointInformation = ({
           </label>
           <span> available to redeem </span>
           <label className="point-info__value">
-            ~ $
-            {isRedeemableLimit
-              ? redeemableLimit
-              : convertPoint(points, pointRateState)}
+            ~ ${convertPoint(points, pointRateState)}
           </label>
         </div>
       </div>

@@ -38,7 +38,10 @@ class Woo_Session_Handler
    */
   public function set($key, $value)
   {
-    WC()->session->__set($key, $value);
+    if (WC()->session) {
+
+      WC()->session->__set($key, $value);
+    }
   }
 
   /**
@@ -50,8 +53,12 @@ class Woo_Session_Handler
    */
   public function get($key, $default = null)
   {
-    $value = WC()->session->__get($key);
-    return $value !== null ? $value : $default;
+    if (WC()->session) {
+
+      $value = WC()->session->__get($key);
+      return $value !== null ? $value : $default;
+    }
+    return $default;
   }
 
   /**
