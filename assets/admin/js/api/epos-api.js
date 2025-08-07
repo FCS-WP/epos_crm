@@ -6,7 +6,7 @@ export const eposRequest = async (
   method = "GET", // Default method set to GET
   token = "FEhI30q7ySHtMfzvSDo6RkxZUDVaQ1BBU3lBcGhYS3BrQStIUT09"
 ) => {
-  const baseURL = "https://livedevs.com";
+  const baseURL = "https://eposdata.com";
   const api = axios.create({ baseURL });
 
   // Build headers

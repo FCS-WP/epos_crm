@@ -24,10 +24,10 @@ if (!defined('EPOS_CRM_REDEEM')) {
 }
 
 if (!defined('EPOS_CRM_CUSTOMER_PORTAL_URL')) {
-  define('EPOS_CRM_CUSTOMER_PORTAL_URL', 'https://myprofile.livedevs.com');
+  define('EPOS_CRM_CUSTOMER_PORTAL_URL', 'https://myprofile.eposdata.com');
 }
 if (!defined('EPOS_CRM_URL_SERVICE')) {
-  define('EPOS_CRM_URL_SERVICE', 'https://livedevs.com');
+  define('EPOS_CRM_URL_SERVICE', 'https://eposdata.com');
 }
 if (!defined('EPOS_CRM_MEMBER_PORTAL_TEXT')) {
   define('EPOS_CRM_MEMBER_PORTAL_TEXT', "Members' Portal");
