@@ -3,7 +3,9 @@
   data-tier-name="<?php echo $customer_data->tier_name; ?>"
   data-points="<?php echo $customer_data->point_balance; ?>"
   data-point-rate="<?php echo $customer_data->point_conversion_rate; ?>"
-  data-tier-name="<?php echo $customer_data->tier_name;; ?>"
+  data-redeemable-limit="<?php echo $customer_data->maximum_redeemable_limit; ?>"
+  data-redeemable-amount="<?php echo $customer_data->maximum_redeemable_amount; ?>"
   data-cart-total="<?php echo $total; ?>"
   data-applied-points="<?php echo $applied_points; ?>">
 </div>
+

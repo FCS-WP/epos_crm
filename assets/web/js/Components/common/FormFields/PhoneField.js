@@ -26,11 +26,15 @@ const PhoneField = ({ label, name, control, error, ...inputProps }) => {
             fullWidth
             size="small"
             error={!!error}
-            helperText={error?.message}
             className="epos-phone-field"
           />
         )}
       />
+       {error && (
+        <Typography variant="body2" color="error" className="epos-error-msg">
+          {error.message}
+        </Typography>
+      )}
     </div>
   );
 };

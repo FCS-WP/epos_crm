@@ -34,10 +34,14 @@ const InputField = ({
             maxRows={1}
             size="small"
             error={!!error}
-            helperText={error?.message}
           />
         )}
       />
+      {error && (
+        <Typography variant="body2" color="error" className="epos-error-msg">
+          {error.message}
+        </Typography>
+      )}
     </div>
   );
 };

@@ -1,9 +1,12 @@
-input#epos_customer_id, #epos_customer_id_field {
+input#epos_customer_id,
+#epos_customer_id_field {
   display: none;
   visibility: hidden;
 }
 
-input#epos_member_id, #epos_member_id_field {
+input#epos_member_id,
+#epos_member_id_field,
+#point_payment_id {
   display: none;
   visibility: hidden;
 }
