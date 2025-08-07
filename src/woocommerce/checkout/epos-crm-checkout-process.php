@@ -56,7 +56,7 @@ class Epos_Crm_Checkout_Process
     $point_used = WC()->session->get('point_used');
 
     //handle remove
-    if ($point_used == 0 ) {
+    if ($point_used == 0) {
       foreach ($cart->get_fees() as $key => $fee) {
         if ($fee->name === EPOS_CRM_REDEEM) {
           unset($cart->fees_api()->fees[$key]);
@@ -86,11 +86,19 @@ class Epos_Crm_Checkout_Process
 
     $redeem_id = Utils_Core::create_guid();
 
+    $point_payment_id = Utils_Core::create_guid();
+
     woocommerce_form_field('epos_order_id', array(
       'type'  => 'hidden',
       'class'         => array('epos_order_id form-row-wide'),
       'placeholder'   => __('epos_order_id'),
     ), $value);
+
+    woocommerce_form_field('point_payment_id', array(
+      'type'  => 'hidden',
+      'class'         => array('point_payment_id form-row-wide'),
+      'placeholder'   => __('point_payment_id'),
+    ), $point_payment_id);
 
     woocommerce_form_field('redeem_id', array(
       'type'  => 'hidden',

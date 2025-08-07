@@ -7,8 +7,6 @@ defined('ABSPATH') or die();
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
-use EPOS_CRM\Src\App\Models\Zippy_Request_Validation;
-use EPOS_CRM\Src\App\Zippy_Response_Handler;
 use EPOS_CRM\Src\Logs\EPOS_CRM_logger;
 use EPOS_CRM\Src\App\Helper\Handle_Response_Errors;
 
@@ -22,7 +20,7 @@ class Epos_Crm_Redeem_Process
 
     $this->client = new Client([
       'base_uri' => EPOS_CRM_URL_SERVICE,
-      'timeout'  => 6,
+      'timeout'  => 10,
     ]);
   }
 
@@ -73,7 +71,7 @@ class Epos_Crm_Redeem_Process
       EPOS_CRM_logger::log_response("Redeem_Error", $response);
       return $response;
     } catch (ConnectException $e) {
-      EPOS_CRM_logger::log_response("Redeem_Error", $e);
+      EPOS_CRM_logger::log_response("Redeem_Error", $e->getMessage());
 
       return [
         'status' => 'error',

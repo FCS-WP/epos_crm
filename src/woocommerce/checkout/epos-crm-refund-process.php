@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use EPOS_CRM\Src\Logs\EPOS_CRM_logger;
 use EPOS_CRM\Src\App\Helper\Handle_Response_Errors;
+use EPOS_CRM\Utils\Utils_Core;
 
 
 class Epos_Crm_Refund_Process
@@ -30,12 +31,16 @@ class Epos_Crm_Refund_Process
   {
 
     try {
+      $id = Utils_Core::create_guid();
 
+      $transacted_at =  gmdate('Y-m-d\TH:i:s\Z');
 
       $refund_request = [
+        "id"         => $id,
         "redemption_id"         => sanitize_text_field($request["redemption_id"]),
         "member_id"       => sanitize_text_field($request["member_id"]),
         "order_id"        => sanitize_text_field($request["order_id"]),
+        "transacted_at"        => $transacted_at
       ];
 
       $params = [

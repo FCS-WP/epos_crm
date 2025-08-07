@@ -35,7 +35,7 @@ class Epos_Crm_Bg_Jobs
 
     if ($log) {
       $orders = wc_get_orders([
-        'meta_key'   => '_redeem_transaction_id',
+        'meta_key'   => 'redeem_id',
         'meta_value' => $redemption_id,
         'limit'      => 1,
       ]);

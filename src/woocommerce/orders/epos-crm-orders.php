@@ -14,7 +14,8 @@ use WC_Order;
 use EPOS_CRM\Src\Woocommerce\Checkout\Epos_Crm_Redeem_Process;
 use EPOS_CRM\Src\Woocommerce\Orders\Epos_Crm_Orders_Payload;
 use EPOS_CRM\Utils\Woo_Session_Handler;
-use EPOS_CRM\Utils\Utils_Core;
+use EPOS_CRM\Src\Woocommerce\Checkout\Epos_Crm_Refund_Process;
+use EPOS_CRM\Src\Logs\EPOS_CRM_logger;
 use EPOS_CRM\Src\Woocommerce\Jobs\Epos_Crm_Bg_Jobs;
 
 
@@ -42,9 +43,11 @@ class Epos_Crm_Orders
 
     add_action('woocommerce_checkout_process', array($this, 'redeem_process_on_checkout'));
 
-    add_action('woocommerce_checkout_create_order', array($this, 'remove_refund_process'));
+    add_action('woocommerce_checkout_order_created', array($this, 'remove_refund_process'));
 
-    // add_action('woocommerce_order_status_cancel', array($this, 'redeem_prefund')); // Process or Completed order status
+    add_action('woocommerce_order_status_cancelled', array($this, 'refund_process')); // cancel order status
+
+    add_action('woocommerce_order_status_refunded', array($this, 'refund_process')); // cancel order status
 
     // add_action('woocommerce_order_status_processing', array($this, 'redeem_process')); // Process or Completed order status
 
@@ -72,7 +75,7 @@ class Epos_Crm_Orders
     } else {
       self::store_redeem_job($payload);
       $jobs = new Epos_Crm_Bg_Jobs;
-      $jobs->schedule_point_refund(3);
+      $jobs->schedule_point_refund($payload['id']);
     }
   }
 
@@ -82,12 +85,13 @@ class Epos_Crm_Orders
     $epos_member_id = isset($_POST['epos_member_id']) ? sanitize_text_field($_POST['epos_member_id']) : '';
     $epos_order_id    = isset($_POST['epos_order_id']) ? sanitize_text_field($_POST['epos_order_id']) : '';
     $redeem_id    = isset($_POST['redeem_id']) ? sanitize_text_field($_POST['redeem_id']) : '';
+    $point_payment_id    = isset($_POST['point_payment_id']) ? sanitize_text_field($_POST['point_payment_id']) : '';
 
     if (!empty($epos_customer_id)) {
 
       $order = new WC_Order($order_id);
 
-      $meta_data = Epos_Crm_Orders_Payload::build_order_meta_data($epos_customer_id, $order, $epos_order_id, $redeem_id);
+      $meta_data = Epos_Crm_Orders_Payload::build_order_meta_data($epos_customer_id, $order, $epos_order_id, $redeem_id, $point_payment_id);
 
       $order->update_meta_data('epos_crm', $meta_data, true);
 
@@ -98,6 +102,8 @@ class Epos_Crm_Orders
 
     if ($this->is_apply_redeem()) {
       $order->update_meta_data('redeem_id', $redeem_id, true);
+
+      $order->update_meta_data('point_payment_id', $point_payment_id, true);
     }
 
     if (!empty($epos_member_id)) {
@@ -107,54 +113,34 @@ class Epos_Crm_Orders
     $order->save_meta_data();
   }
 
-  public function redeem_process($order_id)
+
+  public function refund_process($order_id)
   {
-
-    $is_used_redeem = WC()->session->get('is_used_redeem');
-
-    $point_used = WC()->session->get('points');
-
-    if (empty($is_used_redeem) || empty($point_used)) {
-      return;
-    }
 
     $order = new WC_Order($order_id);
 
     $redeem_id = $order->get_meta('redeem_id');
 
-    $epos_order_id = $order->get_meta('epos_order_id');
+    if (empty($redeem_id)) {
+      return;
+    }
 
-    $epos_member_id = $order->get_meta('epos_member_id');
-
-    $redeem_api = new Epos_Crm_Redeem_Process;
-
-    $transacted_at =  gmdate('Y-m-d\TH:i:s\Z');
-
-    $session = new Woo_Session_Handler;
-
-    $customer_data = $session->get('epos_customer_data');
+    $refund_api = new Epos_Crm_Refund_Process;
 
     $request = array(
-      'id' => $redeem_id,
-      'order_id' => $epos_order_id,
-      'member_id' => $epos_member_id,
-      'tier_id' => $customer_data->tier_id,
-      'points' => $point_used,
-      'transacted_at' => $transacted_at,
-      'conversion_rate' =>  $customer_data->point_conversion_rate,
+      "redemption_id"         => $redeem_id,
+      "member_id"       => $order->get_meta('epos_member_id'),
+      "order_id"        => $order->get_meta('epos_order_id'),
     );
 
-    $response = $redeem_api->API_redeem_process($request);
+    $response = $refund_api->API_refund_process($request);
 
     if (!isset($response['status']) || $response['status'] !== "success") {
 
-      error_log('Redeem API failed: ' . print_r($response, true));
-      $order->add_order_note(__('Redeem API failed. Check logs.'), false);
+      EPOS_CRM_logger::log_response('Refund API failed for Order_ID ' . $order_id . ': ', $response);
+      $order->add_order_note(__('Refund API failed. Check logs.'), false);
     } else {
-      $order->add_order_note(__('Points redeemed successfully.' . $point_used . ''), false);
-
-      //Unset after done
-      $session->delete_redeem_session();
+      $order->add_order_note(__('Points Refund successfully.' . $redeem_id . ''), false);
     }
   }
 
@@ -174,7 +160,9 @@ class Epos_Crm_Orders
     }
 
     $epos_member_id = isset($_POST['epos_member_id']) ? sanitize_text_field($_POST['epos_member_id']) : '';
+
     $epos_order_id    = isset($_POST['epos_order_id']) ? sanitize_text_field($_POST['epos_order_id']) : '';
+
     $redeem_id    = isset($_POST['redeem_id']) ? sanitize_text_field($_POST['redeem_id']) : '';
 
     $transacted_at =  gmdate('Y-m-d\TH:i:s\Z');
@@ -223,14 +211,12 @@ class Epos_Crm_Orders
 
     $wpdb->update(
       $table,
-      array(
-        'status' => 'completed'
-      ),
-      array(
-        'redemption_id' => $redeem_id
-      ),
-      array('%s'),
-      array('%d')
+      ['status' => 'completed'],
+      ['redemption_id' => $redeem_id],
+      ['%s'],
+      ['%s']
     );
+
+    return;
   }
 }
