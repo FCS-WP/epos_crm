@@ -155,7 +155,7 @@ const SignIn = ({ handleClosePopup, handleMissingEmail, tenant, ...props }) => {
           type="submit"
           loading={loading}
         >
-          Login
+          Let's Go!
         </Button>
         <Button
           className="epos-btn"

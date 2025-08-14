@@ -4,13 +4,15 @@
     .MuiTabs-indicator {
       display: none;
     }
-    button.MuiTab-root {
-      background-color: $primary-blur;
-      transition: all 0.2s linear;
-      color: $primary;
-      &.Mui-selected {
-        color: #fff !important;
-        background-color: $primary !important;
+    .epos-tab-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: $title;
+
+      .epos-tab-link {
+        text-transform: uppercase !important;
+        text-decoration: underline !important;
+        color: $primary;
       }
     }
   }
@@ -19,9 +21,9 @@
     font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
     font-size: 28px !important;
     line-height: 32px !important;
-    color: #171c28 !important;
+    color: $title !important;
     text-transform: capitalize !important;
-    font-weight: 700 !important;
+    font-weight: bold !important;
     &.update-email {
       font-size: 16px !important;
       line-height: 24px !important;
