@@ -21,13 +21,11 @@ class Woo_Session_Handler
    */
   public function init_session()
   {
-    // if (!WC()->session) {
+
     WC()->session = new WC_Session_Handler();
     WC()->session->init();
     WC()->session->set_customer_session_cookie(true);
 
-    // var_dump(WC()->session);
-    // }
   }
 
   /**

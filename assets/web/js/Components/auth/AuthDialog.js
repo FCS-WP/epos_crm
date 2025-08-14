@@ -5,7 +5,7 @@ import { Dialog, DialogContent, Tabs, Tab } from "@mui/material";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 
-const AuthDialog = ({ open, onClose }) => {
+const AuthDialog = ({ open, onClose, tenant }) => {
   const [tab, setTab] = useState(0);
   const [hideTab, setHideTab] = useState(false);
   const [siteLogo, setSiteLogo] = useState("");
@@ -82,6 +82,7 @@ const AuthDialog = ({ open, onClose }) => {
           <SignIn
             handleMissingEmail={handleHideTabTitle}
             handleClosePopup={handleOnClose}
+            tenant={tenant}
           />
         )}
       </DialogContent>

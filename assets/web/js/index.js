@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   const checkout = zippyMain?.dataset?.checkout === "true";
+  const tenant = zippyMain?.dataset?.tenant;
   const isLogin = zippyMain?.dataset?.login === "true";
   const username = epos_crm_user_name?.dataset?.customerName || "";
 
@@ -25,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formRoot.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <LoginForm isOpen={!isLogin} />
+        <LoginForm isOpen={!isLogin} tenant={tenant} />
         <ToastContainer />
       </ThemeProvider>
     );
@@ -37,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
       formRoot.render(
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <LoginForm isOpen={true} />
+          <LoginForm isOpen={true} tenant={tenant} />
           <ToastContainer />
         </ThemeProvider>
       );

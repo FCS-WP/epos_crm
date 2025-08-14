@@ -76,9 +76,15 @@ class Epos_Crm_Web
 
     $logo_url = $this->get_logo_url();
 
+    $tanent_domain =  get_option('epos_be_url', null);
+
+    $tenant_name = Utils_Core::get_subdomain($tanent_domain);
+
+    $member_portal = EPOS_CRM_CUSTOMER_PORTAL_URL . '/' . $tenant_name;
+
     $is_checkout = is_checkout() ? 'true' : 'false';
 
-    echo Utils_Core::get_template('form-login.php', ['is_login' => $is_login, 'site_name' => $site_name, 'logo_url' => $logo_url, 'is_checkout' => $is_checkout], dirname(__FILE__), '/templates');
+    echo Utils_Core::get_template('form-login.php', ['is_login' => $is_login, 'tenant_name' => $member_portal, 'site_name' => $site_name, 'logo_url' => $logo_url, 'is_checkout' => $is_checkout], dirname(__FILE__), '/templates');
   }
 
   public function epos_crm_login_icon_callback($atts)
