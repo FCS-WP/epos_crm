@@ -75,6 +75,23 @@ use EPOS_CRM\Src\Admin\Settings;
 use EPOS_CRM\Src\Routers\Epos_Crm_Routers;
 use EPOS_CRM\Src\Web\Epos_Crm_Web;
 use EPOS_CRM\Src\Woocommerce\Epos_Crm_Woocommerce;
+use EPOS_CRM\Src\Database\Epos_Crm_Databases;
+use EPOS_CRM\Src\Woocommerce\Jobs\Epos_Crm_Bg_Jobs;
+use EPOS_CRM\Src\Web\Elements\Epos_Crm_Elements;
+Epos_Crm_Databases::get_instance();
+
+add_action('epos_crm_auto_refund', [Epos_Crm_Bg_Jobs::class, 'epos_crm_auto_refund_callback'], 10, 1);
+
+
+add_filter('cron_schedules', function ($schedules) {
+  $held_duration = get_option('woocommerce_hold_stock_minutes');
+  $cancel_unpaid_interval = apply_filters('woocommerce_cancel_unpaid_orders_interval_minutes', absint($held_duration));
+  $schedules['epos_crm_auto_refund_scheduled'] = [
+    'interval' =>  absint($cancel_unpaid_interval) * 60,
+    'display'  => __('Every Deduct Stock'),
+  ];
+  return $schedules;
+});
 
 add_action('plugins_loaded', function () {
   // Initialize Settings and Routers
@@ -85,3 +102,6 @@ add_action('plugins_loaded', function () {
 });
 
 
+add_action( 'elementor/widgets/register', function( $widgets_manager ) {
+    $widgets_manager->register( new Epos_Crm_Elements() );
+} );

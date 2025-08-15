@@ -21,13 +21,11 @@ class Woo_Session_Handler
    */
   public function init_session()
   {
-    // if (!WC()->session) {
+
     WC()->session = new WC_Session_Handler();
     WC()->session->init();
     WC()->session->set_customer_session_cookie(true);
 
-    // var_dump(WC()->session);
-    // }
   }
 
   /**
@@ -38,7 +36,10 @@ class Woo_Session_Handler
    */
   public function set($key, $value)
   {
-    WC()->session->__set($key, $value);
+    if (WC()->session) {
+
+      WC()->session->__set($key, $value);
+    }
   }
 
   /**
@@ -50,8 +51,12 @@ class Woo_Session_Handler
    */
   public function get($key, $default = null)
   {
-    $value = WC()->session->__get($key);
-    return $value !== null ? $value : $default;
+    if (WC()->session) {
+
+      $value = WC()->session->__get($key);
+      return $value !== null ? $value : $default;
+    }
+    return $default;
   }
 
   /**
@@ -74,6 +79,7 @@ class Woo_Session_Handler
     if (WC()->session) {
       WC()->session->__unset('epos_customer_data');
       WC()->session->__unset('epos_customer_id');
+      WC()->session->__unset('epos_customer_token');
       WC()->session->__unset('is_used_redeem');
       WC()->session->__unset('point_used');
       WC()->session->__unset('points');

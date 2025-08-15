@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -16,6 +22,8 @@ const PointInformation = ({
   pointRate = 0,
   cartTotal = 0,
   currentPoints = 0,
+  redeemableLimit,
+  isRedeemableLimit,
 }) => {
   if (!isOpen) return null;
 
@@ -24,34 +32,60 @@ const PointInformation = ({
   const [loading, setLoading] = useState(false);
   const debounceTimer = useRef(null);
 
-  const convertPoint = useCallback((points, rate) => points * rate, []);
-  const covertToPoint = useCallback((cost, rate) => cost / rate, []);
+  const convertPoint = useCallback(
+    (points, rate) => {
+      const value = points * rate;
+      if (isRedeemableLimit) {
+        const clampedValue = value > redeemableLimit ? redeemableLimit : value;
+        return Math.round(clampedValue * 100) / 100;
+      } else {
+        return value;
+      }
+    },
+    [redeemableLimit]
+  );
+  const convertToPoint = useCallback((cost, rate) => cost / rate, []);
 
-  const pointSchema = yup.object().shape({
-    point: yup
-      .number()
-      .typeError("Point must be a number")
-      .min(0, "You must redeem at least 0 point")
-      .test("max-points-tiered", "", function (value) {
-        const { createError } = this;
+  // Validation schema (memoized)
+  const pointSchema = useMemo(
+    () =>
+      yup.object().shape({
+        point: yup
+          .number()
+          .typeError("Point must be a number")
+          .min(0, "You must redeem at least 0 point")
+          .test("max-points-tiered", "", function (value) {
+            const { createError } = this;
+            if (!value) return true;
 
-        if (!value) return true;
+            if (value > cartTotal) {
+              return createError({
+                message:
+                  "You've entered more points value than your order total",
+              });
+            }
 
-        if (value > cartTotal) {
-          return createError({
-            message: "You've entered more points value than your order total",
-          });
-        }
+            const maxRedeemable = convertPoint(pointBalance, pointRateState);
 
-        if (value > convertPoint(pointBalance, pointRateState)) {
-          return createError({
-            message:
-              "You've entered more points than the points you currently can redeem",
-          });
-        }
-        return true;
+            if (value > maxRedeemable) {
+              return createError({
+                message:
+                  "You've entered more points than the points you currently can redeem",
+              });
+            }
+
+            return true;
+          }),
       }),
-  });
+    [
+      cartTotal,
+      isRedeemableLimit,
+      redeemableLimit,
+      pointBalance,
+      pointRateState,
+      convertPoint,
+    ]
+  );
 
   const {
     control,
@@ -62,24 +96,22 @@ const PointInformation = ({
   } = useForm({
     resolver: yupResolver(pointSchema),
     mode: "onChange",
-    defaultValues: {
-      point: currentPoints > 0 ? currentPoints : null,
-    },
+    defaultValues: { point: currentPoints || null },
   });
 
   const enteredPoint = watch("point");
 
-  // API call for redeem
+  // Redeem handler
   const onSubmit = useCallback(
-    async (data) => {
+    async ({ point }) => {
       if (loading) return;
 
       setLoading(true);
       try {
         const pointData = {
           is_used: true,
-          point_used: data.point,
-          points: covertToPoint(Number(data.point), pointRateState),
+          point_used: point,
+          points: convertToPoint(Number(point), pointRateState),
         };
 
         const { data: response } = await webApi.pointRedeem(pointData);
@@ -88,8 +120,7 @@ const PointInformation = ({
           document.body.dispatchEvent(
             new Event("update_checkout", { bubbles: true })
           );
-          const submitBtn = document.getElementById("place_order");
-          if (submitBtn) submitBtn.disabled = false;
+          document.getElementById("place_order")?.removeAttribute("disabled");
         } else {
           Toast({
             method: "error",
@@ -97,7 +128,7 @@ const PointInformation = ({
               response?.errors || "Failed to redeem point. Please try again.",
           });
         }
-      } catch (err) {
+      } catch {
         Toast({
           method: "error",
           subtitle: "An error occurred while redeeming point",
@@ -123,48 +154,43 @@ const PointInformation = ({
       } else {
         Toast({
           method: "error",
-          subtitle:
-            response?.errors || "Failed to fetch data point. Please try again.",
+          subtitle: response?.errors || "Failed to fetch points data",
         });
       }
-    } catch (err) {
+    } catch {
       Toast({
         method: "error",
-        subtitle: "An error occurred while fetching data point",
+        subtitle: "An error occurred while fetching points",
       });
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch customer data when the first load or points change
+  // Initial load
   useEffect(() => {
-    if (points > 0) {
-      fetchCustomerData();
-    }
-    setPointBalance(convertPoint(points, pointRateState));
-    reset({ point: currentPoints > 0 ? currentPoints : null });
-  }, [points, currentPoints, fetchCustomerData, convertPoint, ,]);
+    if (points > 0) fetchCustomerData();
+    reset({ point: currentPoints || null });
+  }, [points, currentPoints, fetchCustomerData]);
 
   // Debounced auto-submit
   useEffect(() => {
-    const submitBtn = document.getElementById("place_order");
-
-    if (!enteredPoint || !isValid) {
-      if (submitBtn) submitBtn.disabled = true;
-      return;
-    }
+    if (!enteredPoint || !isValid) return;
 
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
-    debounceTimer.current = setTimeout(() => {
-      handleSubmit(onSubmit)();
-    }, 1500);
+    debounceTimer.current = setTimeout(() => handleSubmit(onSubmit)(), 1500);
 
     return () => {
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, [enteredPoint, isValid, handleSubmit]);
+
+  // Disable/enable place order button
+  useEffect(() => {
+    const btn = document.getElementById("place_order");
+    if (btn) btn.disabled = !enteredPoint || !isValid;
+  }, [enteredPoint, isValid]);
 
   return (
     <form
@@ -224,7 +250,7 @@ const PointInformation = ({
             </label>
             <span>
               ${enteredPoint} ~{" "}
-              {covertToPoint(Number(enteredPoint), pointRateState)} point(s)
+              {convertToPoint(Number(enteredPoint), pointRateState)} point(s)
             </span>
           </div>
         </div>

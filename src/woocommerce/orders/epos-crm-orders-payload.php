@@ -10,11 +10,11 @@ use EPOS_CRM\Utils\Woo_Session_Handler;
 class Epos_Crm_Orders_Payload
 {
 
-  public static function build_order_meta_data($epos_customer_id, $order, $order_id, $redeem_id)
+  public static function build_order_meta_data($epos_customer_id, $order, $order_id, $redeem_id, $point_payment_id)
   {
 
 
-    $point_consumption = self::handle_build_point_payment($order, $redeem_id) ?? [];
+    $point_consumption = self::handle_build_point_payment($order, $redeem_id, $point_payment_id) ?? [];
     $woo_payment = self::handle_build_woocommerce_payment($order) ?? [];
     $redeem_point = self::handle_get_redeem_point($order);
     $grand_total = self::handle_get_total_order($order) + $redeem_point;
@@ -58,7 +58,7 @@ class Epos_Crm_Orders_Payload
   }
 
 
-  public static function handle_build_point_payment($order, $redeem_id)
+  public static function handle_build_point_payment($order, $redeem_id, $point_payment_id)
   {
 
     $session = new Woo_Session_Handler;
@@ -73,7 +73,7 @@ class Epos_Crm_Orders_Payload
     $value = round((float) $redeem_point / (float) $customer_data->point_conversion_rate, 2);
 
     return  array(
-      "id" => Utils_Core::create_guid(),
+      "id" => $point_payment_id,
       "strategy" => "point_consumption",
       "points_used" =>  $value,
       "conversion_rate" => $customer_data->point_conversion_rate,

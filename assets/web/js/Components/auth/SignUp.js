@@ -282,9 +282,13 @@ const SignUp = ({ setTab, ...props }) => {
                     }
                   />
                   {errors.accepted && (
-                    <FormHelperText error>
+                    <Typography
+                      variant="body2"
+                      color="error"
+                      className="epos-error-msg"
+                    >
                       {errors.accepted.message}
-                    </FormHelperText>
+                    </Typography>
                   )}
                 </>
               )}

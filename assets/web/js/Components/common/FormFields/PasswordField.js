@@ -6,10 +6,19 @@ import {
   IconButton,
   OutlinedInput,
   Typography,
+  Tooltip,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-
-const PasswordField = ({ label, name, control, error, ...inputProps }) => {
+import { Visibility, VisibilityOff, InfoRounded } from "@mui/icons-material";
+import PasswordInfoTooltip from "../notifications/PasswordInfoTooltip";
+const PasswordField = ({
+  label,
+  name,
+  control,
+  error,
+  tootip,
+  tenant,
+  ...inputProps
+}) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
@@ -24,7 +33,19 @@ const PasswordField = ({ label, name, control, error, ...inputProps }) => {
           <FormControl fullWidth variant="outlined" size="small">
             {label && (
               <Typography className="input-label" gutterBottom>
-                {label}
+                {label}{" "}
+                {tootip && (
+                  <Tooltip
+                    className="epos-tooltip"
+                    title={<PasswordInfoTooltip tenant={tenant} />}
+                    arrow
+                    sx={{ backgroundColor: "#fff", border: "1px solid #ccc" }}
+                  >
+                    <IconButton size="small">
+                      <InfoRounded />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 {<span style={{ color: "#CC0000" }}> *</span>}
               </Typography>
             )}

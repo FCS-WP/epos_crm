@@ -64,6 +64,7 @@ class Epos_Customer_controller
       $phone = !empty($data->attributes->phone_number) ? $data->attributes->phone_number : '';
       $is_validEmail = EPOS_Helper::isValidEmail($email);
       $epos_customer_token = self::getTokenAutoLogin($rawToken);
+
       if ($is_validEmail) {
         $session = new Woo_Session_Handler;
         $session->init_session();
@@ -223,7 +224,6 @@ class Epos_Customer_controller
       $response['data'] = $data;
       if (!empty($data)) {
         $session = new Woo_Session_Handler;
-        $session->init_session();
         $session->set(self::$customer_key, $data);
         $session->set(self::$customer_id, $data->id);
         $session->set(self::$member_id, $data->member_id);

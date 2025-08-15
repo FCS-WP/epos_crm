@@ -98,7 +98,12 @@ p.MuiFormHelperText-root {
 }
 
 // Button Auto Login
-
+button.epos-btn {
+  color: #fff !important;
+  &:hover {
+    color: #fff !important;
+  }
+}
 .epos-btn__auto_login {
   display: flex !important;
   justify-content: center;
@@ -124,5 +129,19 @@ p.MuiFormHelperText-root {
       display: inline-flex;
       align-items: center;
     }
+  }
+}
+.MuiTooltip-tooltip {
+  background: #fff !important;
+  color: #000 !important;
+  border: 1px solid $textMuted !important;
+}
+button.epos-tooltip {
+  padding: 0px !important;
+  background-color: transparent !important;
+  color: $textMuted !important;
+  svg {
+    width: 20px !important;
+    height: 20px !important;
   }
 }
