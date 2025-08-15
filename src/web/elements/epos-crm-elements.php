@@ -19,6 +19,8 @@ use Elementor\Group_Control_Text_Shadow;
 use Elementor\Group_Control_Text_Stroke;
 use Elementor\Group_Control_Typography;
 use Elementor\Core\Kits\Documents\Tabs\Global_Colors;
+use EPOS_CRM\Utils\Woo_Session_Handler;
+
 
 
 
@@ -43,6 +45,11 @@ class Epos_Crm_Elements  extends Widget_Base
   public function get_categories()
   {
     return ['epos-crm'];
+  }
+
+  public function get_style_depends()
+  {
+    return ['epos_crm_web-css-css'];
   }
 
   protected function register_controls()
@@ -459,7 +466,11 @@ class Epos_Crm_Elements  extends Widget_Base
     $html_tag = $has_link ? 'a' : 'span';
     $migrated = isset($settings['__fa4_migrated']['selected_icon']);
     $is_new = ! isset($settings['icon']) && Icons_Manager::is_migration_allowed();
-    $has_content = ! Utils::is_empty($settings['title_text'])
+    $has_content = ! Utils::is_empty($settings['title_text']);
+    $session = new Woo_Session_Handler;
+
+    $is_login = !empty($session->get('epos_customer_data')) ? true : false;
+
 
 ?>
     <!-- Icon  -->
@@ -494,7 +505,15 @@ class Epos_Crm_Elements  extends Widget_Base
         </div>
       <?php endif; ?>
     </div>
-    <div id="epos-crm-login_dropdown"></div>
+    <?php if ($is_login ): ?>
+      <div id="epos_crm_login_dropdown">
+        <ul class="epos_crm_dropdown sub-menu">
+          <li class="dropdown_item">
+            <a href="<?php echo wp_logout_url(get_permalink()); ?>" class="elementor-item ">Logout</a>
+          </li>
+        </ul>
+      </div>
+    <?php endif; ?>
   <?php
   }
 
@@ -552,7 +571,13 @@ class Epos_Crm_Elements  extends Widget_Base
 
               </div>
               <# } #>
-
+                <div id="epos_crm_login_dropdown">
+                  <ul class="epos_crm_dropdown sub-menu">
+                    <li class="dropdown_item">
+                      <a href="<?php echo wp_logout_url(get_permalink()); ?>" class="elementor-item ">Logout</a>
+                    </li>
+                  </ul>
+                </div>
       </div>
   <?php
   }

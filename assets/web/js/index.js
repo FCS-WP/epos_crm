@@ -5,11 +5,14 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import LoginForm from "./Components/LoginForm";
 import PointInformation from "./Components/PointInformation";
+import LoginDropdown from "./Components/LoginDropdown";
+
 
 document.addEventListener("DOMContentLoaded", function () {
   const zippyMain = document.getElementById("epos_crm_login_form");
   const epos_login_icon = document.getElementById("epos_crm_login");
   const epos_crm_user_name = document.getElementById("epos_crm_user_name");
+  const epos_crm_menu_dropdown = document.getElementById("epos_crm_login_dropdown");
   const epos_crm_point_information = document.getElementById(
     "epos_crm_point_information"
   );
