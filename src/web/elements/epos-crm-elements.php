@@ -49,7 +49,7 @@ class Epos_Crm_Elements  extends Widget_Base
 
   public function get_style_depends()
   {
-    return ['epos_crm_web-css-css'];
+    return ['epos_crm_web-css'];
   }
 
   protected function register_controls()

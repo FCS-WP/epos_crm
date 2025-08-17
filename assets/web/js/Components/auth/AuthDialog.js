@@ -74,7 +74,7 @@ const AuthDialog = ({ open, onClose, tenant }) => {
       <DialogContent sx={{ padding: "20px 12px" }}>
         <Box textAlign="center">
           <img
-            style={{ width: "150px", maxWidth: "100px", marginBottom: "20px" }}
+            style={{ width: "150px", maxWidth: "150px", marginBottom: "20px" }}
             src={siteLogo || eposLogo}
             alt="EPOS Site Logo"
             className="epos-crm_logo"
