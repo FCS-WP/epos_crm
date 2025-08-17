@@ -77,7 +77,7 @@ use EPOS_CRM\Src\Web\Epos_Crm_Web;
 use EPOS_CRM\Src\Woocommerce\Epos_Crm_Woocommerce;
 use EPOS_CRM\Src\Database\Epos_Crm_Databases;
 use EPOS_CRM\Src\Woocommerce\Jobs\Epos_Crm_Bg_Jobs;
-
+use EPOS_CRM\Src\Web\Elements\Epos_Crm_Elements;
 Epos_Crm_Databases::get_instance();
 
 add_action('epos_crm_auto_refund', [Epos_Crm_Bg_Jobs::class, 'epos_crm_auto_refund_callback'], 10, 1);
@@ -100,3 +100,8 @@ add_action('plugins_loaded', function () {
   Epos_Crm_Web::get_instance();
   Epos_Crm_Woocommerce::get_instance();
 });
+
+
+add_action( 'elementor/widgets/register', function( $widgets_manager ) {
+    $widgets_manager->register( new Epos_Crm_Elements() );
+} );

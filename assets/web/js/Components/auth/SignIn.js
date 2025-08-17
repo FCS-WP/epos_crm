@@ -19,7 +19,7 @@ const loginSchema = yup.object().shape({
   password: yup.string().required("Password is a required field"),
 });
 
-const SignIn = ({ handleClosePopup, handleMissingEmail, ...props }) => {
+const SignIn = ({ handleClosePopup, handleMissingEmail, tenant, ...props }) => {
   const [loading, setLoading] = useState(false);
   const [isMissingEmail, setIsMissingEmail] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -136,6 +136,8 @@ const SignIn = ({ handleClosePopup, handleMissingEmail, ...props }) => {
             name="password"
             control={control}
             error={errors.password}
+            tootip={true}
+            tenant={tenant}
           />
         </Grid>
       </Grid>
@@ -153,7 +155,7 @@ const SignIn = ({ handleClosePopup, handleMissingEmail, ...props }) => {
           type="submit"
           loading={loading}
         >
-          Login
+          Let's Go!
         </Button>
         <Button
           className="epos-btn"
