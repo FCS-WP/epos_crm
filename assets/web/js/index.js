@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import LoginForm from "./Components/LoginForm";
 import PointInformation from "./Components/PointInformation";
 
+
 document.addEventListener("DOMContentLoaded", function () {
   const zippyMain = document.getElementById("epos_crm_login_form");
   const epos_login_icon = document.getElementById("epos_crm_login");

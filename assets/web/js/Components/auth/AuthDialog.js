@@ -40,7 +40,7 @@ const AuthDialog = ({ open, onClose, tenant }) => {
 
   const renderTabPrompt = () => {
     return (
-      <Box mt={3} textAlign="center" className="epos-tab-form">
+      <Box mt={6} textAlign="center" className="epos-tab-form">
         <Typography variant="body2" className="epos-tab-title">
           {tab === 0 ? "Don't have an account?" : "Have an account?"}
           <Box
@@ -74,9 +74,10 @@ const AuthDialog = ({ open, onClose, tenant }) => {
       <DialogContent sx={{ padding: "20px 12px" }}>
         <Box textAlign="center">
           <img
-            style={{ width: "150px", marginBottom: "20px" }}
+            style={{ width: "150px", maxWidth: "150px", marginBottom: "20px" }}
             src={siteLogo || eposLogo}
             alt="EPOS Site Logo"
+            className="epos-crm_logo"
           />
         </Box>
 
