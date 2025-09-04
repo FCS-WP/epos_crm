@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
 import eposLogo from "../../../icons/eposLogo.png";
-import {
-  Dialog,
-  DialogContent,
-  Tabs,
-  Tab,
-  Typography,
-  Box,
-} from "@mui/material";
+import { Dialog, DialogContent, Typography, Box } from "@mui/material";
 
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
@@ -18,57 +11,57 @@ const AuthDialog = ({ open, onClose, tenant }) => {
   const [siteLogo, setSiteLogo] = useState("");
 
   useEffect(() => {
+    if (open) {
+      setTab(0);
+      setHideTab(false);
+    }
+  }, [open]);
+
+  // Load site logo from DOM dataset
+  useEffect(() => {
     const element = document.getElementById("epos_crm_login_form");
     if (element?.dataset?.siteLogo) {
       setSiteLogo(element.dataset.siteLogo);
     }
-  }, [hideTab]);
-
-  const handleTabChange = (event, newValue) => {
-    setTab(newValue);
-  };
-
-  const handleHideTabTitle = (hide) => {
-    setHideTab(hide);
-  };
+  }, []);
 
   const handleOnClose = (event, reason) => {
-    if (reason !== "backdropClick") {
-      onClose(event);
-    }
+    if (reason === "backdropClick") return;
+    onClose(event);
   };
 
-  const renderTabPrompt = () => {
-    return (
-      <Box mt={6} textAlign="center" className="epos-tab-form">
-        <Typography variant="body2" className="epos-tab-title">
-          {tab === 0 ? "Don't have an account?" : "Have an account?"}
-          <Box
-            className="epos-tab-link"
-            component="span"
-            sx={{
-              cursor: "pointer",
-              color: "primary.main",
-              fontWeight: "bold",
-              textDecoration: "underline",
-              ml: 0.5,
-            }}
-            onClick={() => setTab(tab === 0 ? 1 : 0)}
-          >
-            {tab === 0 ? "Sign Up Now!" : "Log In Now"}
-          </Box>
-        </Typography>
-      </Box>
-    );
-  };
+  const renderTabPrompt = () => (
+    <Box mt={6} textAlign="center" className="epos-tab-form">
+      <Typography variant="body2" className="epos-tab-title">
+        {tab === 0 ? "Don't have an account?" : "Have an account?"}
+        <Box
+          className="epos-tab-link"
+          component="span"
+          sx={{
+            cursor: "pointer",
+            color: "primary.main",
+            fontWeight: "bold",
+            textDecoration: "underline",
+            ml: 0.5,
+          }}
+          onClick={() => setTab(tab === 0 ? 1 : 0)}
+        >
+          {tab === 0 ? "Sign Up Now!" : "Log In Now"}
+        </Box>
+      </Typography>
+    </Box>
+  );
 
   return (
     <Dialog
       open={open}
       onClose={handleOnClose}
-      disableEscapeKeyDown
+      disableEscapeKeyDown={true}
       maxWidth="xs"
+      fullWidth
       className="epos-crm-form"
+      aria-labelledby="auth-dialog-title"
+      aria-describedby="auth-dialog-description"
       sx={{ padding: 0, margin: 0 }}
     >
       <DialogContent sx={{ padding: "20px 12px" }}>
@@ -83,7 +76,7 @@ const AuthDialog = ({ open, onClose, tenant }) => {
 
         {tab === 0 ? (
           <SignIn
-            handleMissingEmail={handleHideTabTitle}
+            handleMissingEmail={setHideTab}
             handleClosePopup={onClose}
             tenant={tenant}
           />
@@ -92,6 +85,23 @@ const AuthDialog = ({ open, onClose, tenant }) => {
         )}
 
         {!hideTab && renderTabPrompt()}
+
+        <Box mt={6} textAlign="center" className="epos-tab-form">
+          <Typography variant="body2" className="epos-tab-title">
+            <Box
+              className="epos-close-popup"
+              component="span"
+              sx={{
+                cursor: "pointer",
+                textDecoration: "underline",
+                ml: 0.5,
+              }}
+              onClick={() => onClose()}
+            >
+              No, Thanks!
+            </Box>
+          </Typography>
+        </Box>
       </DialogContent>
     </Dialog>
   );

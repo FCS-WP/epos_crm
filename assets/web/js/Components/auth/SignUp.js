@@ -151,7 +151,7 @@ const SignUp = ({ setTab, ...props }) => {
   return (
     <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
       <Typography className="get-started" variant="h4" gutterBottom>
-        Register Now!
+        Get Started With Us
       </Typography>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
