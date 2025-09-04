@@ -18,6 +18,7 @@ const PasswordInfoTooltip = ({ tenant }) => {
           color="primary"
           target="_blank"
           rel="noopener"
+          className="epos-crm_tanent_link"
         >
           Members' Portal
         </Link>{" "}

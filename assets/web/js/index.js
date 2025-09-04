@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (epos_crm_point_information) {
     const pointInfoRoot = ReactDOM.createRoot(epos_crm_point_information);
-    const points = parseInt(epos_crm_point_information?.dataset?.points) || 0;
+    const points = parseFloat(epos_crm_point_information?.dataset?.points,2).toFixed(2) || 0;
     const membershipTier = epos_crm_point_information?.dataset?.tierName || "";
     const pointRate =
       parseFloat(epos_crm_point_information?.dataset?.pointRate) || 0;
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const isRedeemableLimit =
       parseFloat(epos_crm_point_information?.dataset?.redeemableLimit) || 0;
     const redeemableLimit =
-      parseFloat(epos_crm_point_information?.dataset?.redeemableAmount) || 0;
+      parseFloat(epos_crm_point_information?.dataset?.redeemableAmount).toFixed(2) || 0;
     pointInfoRoot.render(
       <ThemeProvider theme={theme}>
         <CssBaseline />

@@ -31,20 +31,19 @@ const PointInformation = ({
   const [pointRateState, setPointRate] = useState(pointRate);
   const [loading, setLoading] = useState(false);
   const debounceTimer = useRef(null);
-
   const convertPoint = useCallback(
     (points, rate) => {
       const value = points * rate;
       if (isRedeemableLimit) {
         const clampedValue = value > redeemableLimit ? redeemableLimit : value;
-        return Math.round(clampedValue * 100) / 100;
+        return ((clampedValue * 100) / 100).toFixed(2);
       } else {
         return value;
       }
     },
     [redeemableLimit]
   );
-  const convertToPoint = useCallback((cost, rate) => cost / rate, []);
+  const convertToPoint = useCallback((cost, rate) => parseFloat(cost / rate).toFixed(2), []);
 
   // Validation schema (memoized)
   const pointSchema = useMemo(
