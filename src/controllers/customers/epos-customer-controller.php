@@ -371,13 +371,13 @@ class Epos_Customer_controller
 
       $login = self::$client->post("api/modules/woocommerce/customers/login", $options);
 
-      // var_dump($login);
+      pr($login->getHeaders());
 
       $response = array(
         'status' => 'success',
         'message' => 'Login successfully',
         'data' => json_decode($login->getBody())->data,
-        'authorization' => $login->getHeaders()['Authorization']
+        'authorization' => $login->getHeaders()['authorization']
       );
 
       return $response;

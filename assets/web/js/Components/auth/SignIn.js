@@ -121,7 +121,7 @@ const SignIn = ({ handleClosePopup, handleMissingEmail, tenant, ...props }) => {
             marginBottom={6}
             marginTop={4}
           >
-            Let’s Get Started
+            Get Started With Us
           </Typography>
           <PhoneField
             label="Phone Number"
