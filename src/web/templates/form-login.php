@@ -1,1 +1,1 @@
-    <div id="epos_crm_login_form" data-tenant="<?php echo $tenant_name ?>" data-login="<?php echo $is_login ?>" data-checkout="<?php echo $is_checkout ?>" data-site-name="<?php echo $site_name ?>" data-site-logo="<?php echo $logo_url ?>"></div>'
+<div id="epos_crm_login_form" data-tenant="<?php echo $tenant_name ?>" data-login="<?php echo $is_login ?>" data-checkout="<?php echo $is_checkout ?>" data-site-name="<?php echo $site_name ?>" data-site-logo="<?php echo $logo_url ?>"></div>
